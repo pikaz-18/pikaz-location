@@ -3,11 +3,12 @@ const path = require('path');
 module.exports = {
     mode: 'production',
     entry: {
-        "pikaz-location": "./src/index.js",
+        "pikaz-location": path.resolve(__dirname, 'src', 'index.js'),
     },
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'lib'),
-        libraryTarget: 'umd'
-    },
+        libraryTarget: 'umd',
+        library: "pikazLocation"
+    }
 };
