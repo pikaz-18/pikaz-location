@@ -3,9 +3,9 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2021-12-31 22:16:12
+ * @LastEditTime: 2021-12-31 22:49:02
  */
-const pointInPolygon = require("point-in-polygon")
+const pointInPolygon = require("point-in-polygon/flat")
 
 /**
  * @description: html5定位
