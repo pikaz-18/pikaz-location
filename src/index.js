@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-03 20:13:33
+ * @LastEditTime: 2022-01-03 20:55:29
  */
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
@@ -36,7 +36,8 @@ const deepCopy = (obj) => {
  * @param {*}enableHighAccuracy/是否需要高精度定位
  * @return {*}
  */
-const getH5Location = ({ timeout, enableHighAccuracy }) => {
+const getH5Location = (obj) => {
+    const { timeout, enableHighAccuracy } = { ...defaultConfig, ...obj }
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             const id = navigator.geolocation.watchPosition((e) => {
@@ -72,7 +73,8 @@ const getH5Location = ({ timeout, enableHighAccuracy }) => {
  * @param {*}timeout/超时时间
  * @return {*}
  */
-const getIpLocation = ({ timeout }) => {
+const getIpLocation = (obj) => {
+    const { timeout } = { ...defaultConfig, ...obj }
     const request = () => {
         return new Promise((resolve, reject) => {
             fetch("http://www.geoplugin.net/json.gp").then((res) => res.json()).then((res) => {
@@ -166,13 +168,13 @@ const getLocation = (obj) => {
     return new Promise((resolve, reject) => {
         getH5Location(config).then(({ latitude, longitude }) => {
             getAddress({ latitude, longitude }).then(res => {
-                resolve(res)
+                resolve({ ...res, type: "h5" })
             })
         }).catch(err => {
             console.log(err);
             getIpLocation(config).then(({ latitude, longitude }) => {
                 getAddress({ latitude, longitude }).then(res => {
-                    resolve(res)
+                    resolve({ ...res, type: "ip" })
                 })
             }).catch(err => {
                 console.log(err);
@@ -182,4 +184,37 @@ const getLocation = (obj) => {
     })
 }
 
-module.exports = { getLocation, getH5Location, getIpLocation, getAddress }
+/**
+ * @description: 格式化searchList返回结果
+ * @param {*}list/原列表
+ * @return {*}
+ */
+const formatSearchListResult = (list) => {
+    return list.map(item => {
+        return { code: item.id, name: item.name, pinyin: item.pinyin, location: item.location }
+    })
+}
+
+/**
+ * @description: 省市区三级联动
+ * @param {*}code/省、市、区县行政编码
+ * @return {*}
+ */
+const searchList = async (code) => {
+    // 省级
+    if (!code) {
+        const provinceArr = await importFile("province", 0)
+        return formatSearchListResult(provinceArr)
+    }
+    const id = code.toString()
+    // 市级
+    if (id.slice(2) === "0000") {
+        const cityArr = await importFile("city", code)
+        return formatSearchListResult(cityArr)
+    }
+    // 区、县
+    const districtArr = await importFile("district", code)
+    return formatSearchListResult(districtArr)
+}
+
+module.exports = { getLocation, getH5Location, getIpLocation, getAddress, searchList }

@@ -1,0 +1,71 @@
+<!--
+ * @Description: 这是***页面（组件）
+ * @Date: 2022-01-03 20:41:58
+ * @Author: zouzheng
+ * @LastEditors: zouzheng
+ * @LastEditTime: 2022-01-03 20:57:33
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../lib/pikaz-location.js"></script>
+</head>
+
+<body>
+    <div>打开控制台查看运行结果</div>
+    <script>
+        const { getLocation, getH5Location, getIpLocation, getAddress, searchList } = window.pikazLocation
+
+        // getLocation示例
+        getLocation().then(res => {
+            console.log({ getLocation: res });
+        }).catch(err => {
+            console.log({ getLocation: err });
+        })
+
+        // getH5Location示例
+        getH5Location().then(res => {
+            console.log({ getH5Location: res });
+        }).catch(err => {
+            console.log({ getH5Location: err });
+        })
+
+        // getIpLocation示例
+        getIpLocation().then(res => {
+            console.log({ getIpLocation: res });
+
+            // getAddress示例
+            const { latitude, longitude } = res
+            getAddress({ latitude, longitude }).then(res => {
+                console.log({ getAddress: res });
+            }).catch(err => {
+                console.log({ getAddress: err });
+            })
+        }).catch(err => {
+            console.log({ getIpLocation: err });
+        })
+
+        // searchList示例
+        searchList().then(provinceList => {
+            // 省列表
+            console.log({ provinceList });
+            const { code: province } = provinceList[0]
+            searchList(province).then(cityList => {
+                // 市列表
+                console.log({ cityList });
+                const { code: city } = cityList[0]
+                searchList(city).then(districtList => {
+                    // 区县列表
+                    console.log({ districtList });
+                })
+            })
+        })
+    </script>
+</body>
+
+</html>
