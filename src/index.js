@@ -3,16 +3,26 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2021-12-31 22:49:02
+ * @LastEditTime: 2022-01-03 16:10:40
  */
 const pointInPolygon = require("point-in-polygon/flat")
+const { decompressFromEncodedURIComponent } = require("lz-string")
+
+// 默认配置
+const defaultConfig = {
+    // 超时时间
+    timeout: 3000,
+    // 是否需要高精度定位
+    enableHighAccuracy: false
+}
 
 /**
  * @description: html5定位
- * @param {*}
+ * @param {*}timeout/超时时间
+ * @param {*}enableHighAccuracy/是否需要高精度定位
  * @return {*}
  */
-const getH5Location = ({ timeout }) => {
+const getH5Location = ({ timeout, enableHighAccuracy }) => {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             const id = navigator.geolocation.watchPosition((e) => {
@@ -24,19 +34,19 @@ const getH5Location = ({ timeout }) => {
                 navigator.geolocation.clearWatch(id);
                 switch (error.code) {
                     case error.PERMISSION_DENIED:
-                        reject("已拒绝定位")
+                        reject("html5已拒绝定位")
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        reject("位置信息不可用")
+                        reject("html5位置信息不可用")
                         break;
                     case error.TIMEOUT:
-                        reject("定位超时")
+                        reject("html5定位超时")
                         break;
                     case error.UNKNOWN_ERROR:
-                        reject("未知错误")
+                        reject("html5定位未知错误")
                         break;
                 }
-            }, { enableHighAccuracy: false, timeout, maximumAge: 0 });
+            }, { enableHighAccuracy, timeout, maximumAge: 0 });
             return
         }
         reject("浏览器不支持HTML5定位")
@@ -45,27 +55,34 @@ const getH5Location = ({ timeout }) => {
 
 /**
  * @description: ip定位
- * @param {*}
+ * @param {*}timeout/超时时间
  * @return {*}
  */
 const getIpLocation = ({ timeout }) => {
-    return new Promise((resolve, reject) => {
-        fetch("http://www.geoplugin.net/json.gp")
-            .then((res) => res.json())
-            .then((res) => {
+    const request = () => {
+        return new Promise((resolve, reject) => {
+            fetch("http://www.geoplugin.net/json.gp").then((res) => res.json()).then((res) => {
                 resolve({ latitude: Number(res.geoplugin_latitude), longitude: Number(res.geoplugin_longitude) })
             }).catch(() => {
-                reject("定位失败")
+                reject("ip定位失败")
             });
-        setTimeout(() => {
-            reject("定位失败")
-        }, timeout);
-    })
+        })
+    }
+    const timeoutFuc = (timeout) => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                reject("ip定位超时")
+            }, timeout);
+        })
+    }
+    return Promise.race([request(), timeoutFuc(timeout)])
 }
 
 /**
  * @description: 经纬度查询地址
- * @param {*}
+ * @param {*} latitude/纬度
+ * @param {*} longitude/经度
+ * @param {*}address/地区数组
  * @return {*}
  */
 const search = ({ latitude, longitude, address }) => {
@@ -80,27 +97,40 @@ const search = ({ latitude, longitude, address }) => {
 }
 
 /**
+ * @description: 引入文件
+ * @param {*} type/区域类型
+ * @param {*} id/区域编码
+ * @return {*}
+ */
+const importFile = async (type, id) => {
+    const file = await import(`./miniStore/${type}/${id}`)
+    const jsonStr = decompressFromEncodedURIComponent(file.default)
+    const arr = JSON.parse(jsonStr)
+    return arr
+}
+
+/**
  * @description: 获取地址
- * @param {*} latitude
- * @param {*} longitude
+ * @param {*} latitude/纬度
+ * @param {*} longitude/经度
  * @return {*}
  */
 const getAddress = async ({ latitude, longitude }) => {
     const result = { latitude, longitude, province: "", city: "", district: "", code: "", details: { province: { code: "", location: "", name: "", pinyin: "" }, city: { code: "", location: "", name: "", pinyin: "" }, district: { code: "", location: "", name: "", pinyin: "" } } }
-    const provinceFile = await import("./store/province/index")
-    const province = search({ latitude, longitude, address: Object.values(provinceFile) })
+    const provinceArr = await importFile("province", 0)
+    const province = search({ latitude, longitude, address: provinceArr })
     if (province) {
         result.province = province.name
         result.code = province.id
         result.details.province = { code: province.id, location: { latitude: province.location.lat, longitude: province.location.lng }, name: province.name, pinyin: province.pinyin }
-        const cityFile = await import(`./store/city/${province.id}`)
-        const city = search({ latitude, longitude, address: Object.values(cityFile) })
+        const cityArr = await importFile("city", province.id)
+        const city = search({ latitude, longitude, address: cityArr })
         if (city) {
             result.city = city.name
             result.code = city.id
             result.details.city = { code: city.id, location: { latitude: city.location.lat, longitude: city.location.lng }, name: city.name, pinyin: city.pinyin }
-            const districtFile = await import(`./store/district/${city.id}`)
-            const district = search({ latitude, longitude, address: Object.values(districtFile) })
+            const districtArr = await importFile("district", city.id)
+            const district = search({ latitude, longitude, address: districtArr })
             if (district) {
                 result.district = district.name
                 result.code = district.id
@@ -113,19 +143,29 @@ const getAddress = async ({ latitude, longitude }) => {
 
 /**
  * @description: 定位
- * @param {*}
+ * @param {*}timeout/超时时间
+ * @param {*}enableHighAccuracy/是否需要高精度定位
  * @return {*}
  */
-const getLocation = () => {
+const getLocation = (obj) => {
+    const config = { ...defaultConfig, ...obj }
     return new Promise((resolve, reject) => {
-        getH5Location({ timeout: 3000 }).then(({ latitude, longitude }) => {
+        getH5Location(config).then(({ latitude, longitude }) => {
             getAddress({ latitude, longitude }).then(res => {
                 resolve(res)
             })
         }).catch(err => {
-            reject(err)
+            console.log(err);
+            getIpLocation(config).then(({ latitude, longitude }) => {
+                getAddress({ latitude, longitude }).then(res => {
+                    resolve(res)
+                })
+            }).catch(err => {
+                console.log(err);
+                reject(err)
+            })
         })
     })
 }
 
-module.exports = getLocation
+module.exports = { getLocation, getH5Location, getIpLocation, getAddress }

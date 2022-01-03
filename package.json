@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "compress": "node utils/compress.js",
     "build": "webpack"
   },
   "repository": {
