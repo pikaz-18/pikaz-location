@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-03 16:10:40
+ * @LastEditTime: 2022-01-03 20:13:33
  */
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
@@ -14,6 +14,20 @@ const defaultConfig = {
     timeout: 3000,
     // 是否需要高精度定位
     enableHighAccuracy: false
+}
+
+// 基础返回结果：province省；/city市；/district区县；/code行政编码；/details地址详情；
+const defaultResult = { province: "", city: "", district: "", code: "", details: { province: { code: "", location: {}, name: "", pinyin: "" }, city: { code: "", location: {}, name: "", pinyin: "" }, district: { code: "", location: {}, name: "", pinyin: "" } } }
+
+/**
+ * @description: 深拷贝
+ * @param {*}
+ * @return {*}
+ */
+const deepCopy = (obj) => {
+    const oldObj = JSON.stringify(obj)
+    const newObj = JSON.parse(oldObj)
+    return newObj
 }
 
 /**
@@ -116,25 +130,25 @@ const importFile = async (type, id) => {
  * @return {*}
  */
 const getAddress = async ({ latitude, longitude }) => {
-    const result = { latitude, longitude, province: "", city: "", district: "", code: "", details: { province: { code: "", location: "", name: "", pinyin: "" }, city: { code: "", location: "", name: "", pinyin: "" }, district: { code: "", location: "", name: "", pinyin: "" } } }
+    const result = { ...deepCopy(defaultResult), latitude, longitude }
     const provinceArr = await importFile("province", 0)
     const province = search({ latitude, longitude, address: provinceArr })
     if (province) {
         result.province = province.name
         result.code = province.id
-        result.details.province = { code: province.id, location: { latitude: province.location.lat, longitude: province.location.lng }, name: province.name, pinyin: province.pinyin }
+        result.details.province = { code: province.id, location: province.location, name: province.name, pinyin: province.pinyin }
         const cityArr = await importFile("city", province.id)
         const city = search({ latitude, longitude, address: cityArr })
         if (city) {
             result.city = city.name
             result.code = city.id
-            result.details.city = { code: city.id, location: { latitude: city.location.lat, longitude: city.location.lng }, name: city.name, pinyin: city.pinyin }
+            result.details.city = { code: city.id, location: city.location, name: city.name, pinyin: city.pinyin }
             const districtArr = await importFile("district", city.id)
             const district = search({ latitude, longitude, address: districtArr })
             if (district) {
                 result.district = district.name
                 result.code = district.id
-                result.details.district = { code: district.id, location: { latitude: district.location.lat, longitude: district.location.lng }, name: district.name, pinyin: district.pinyin }
+                result.details.district = { code: district.id, location: district.location, name: district.name, pinyin: district.pinyin }
             }
         }
     }

@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-01 20:18:51
+ * @LastEditTime: 2022-01-03 20:08:22
  */
 const path = require('path');
 
@@ -18,7 +18,7 @@ module.exports = {
         libraryTarget: 'umd',
         library: "pikazLocation"
     },
-    optimization: {
-        minimize: true,
-    },
+    // optimization: {
+    //     minimize: true,
+    // },
 };
