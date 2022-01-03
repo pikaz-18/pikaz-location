@@ -1,8 +1,18 @@
 {
   "name": "@pikaz/location",
   "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
+  "description": "geolocation plugin",
+  "private": false,
+  "main": "lib/pikaz-location.js",
+  "keywords": [
+    "geolocation",
+    "location",
+    "longitude",
+    "latitude",
+    "province",
+    "city",
+    "district"
+  ],
   "scripts": {
     "compress": "node utils/compress.js",
     "build": "webpack"
@@ -12,7 +22,7 @@
     "url": "git+https://github.com/pikaz-18/pikaz-location.git"
   },
   "author": "pikaz",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/pikaz-18/pikaz-location/issues"
   },
