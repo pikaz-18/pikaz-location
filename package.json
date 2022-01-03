@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "description": "geolocation plugin",
   "private": false,
-  "main": "lib/pikaz-location.js",
+  "main": "lib/main.js",
+  "scripts": {
+    "compress": "node utils/compress.js",
+    "build": "webpack"
+  },
   "keywords": [
     "geolocation",
     "location",
@@ -17,9 +21,8 @@
     "lib",
     "example"
   ],
-  "scripts": {
-    "compress": "node utils/compress.js",
-    "build": "webpack"
+  "publishConfig": {
+    "access": "public"
   },
   "repository": {
     "type": "git",
