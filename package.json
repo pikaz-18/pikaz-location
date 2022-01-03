@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/pikaz-18/pikaz-location#readme",
   "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
   },

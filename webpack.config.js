@@ -3,9 +3,10 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-03 20:45:00
+ * @LastEditTime: 2022-01-03 22:19:50
  */
 const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
     mode: 'production',
@@ -18,4 +19,7 @@ module.exports = {
         libraryTarget: 'umd',
         library: "pikazLocation"
     },
+    plugins: [
+        new CleanWebpackPlugin(),
+    ]
 };

@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-03 20:55:29
+ * @LastEditTime: 2022-01-03 22:15:41
  */
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
@@ -119,7 +119,7 @@ const search = ({ latitude, longitude, address }) => {
  * @return {*}
  */
 const importFile = async (type, id) => {
-    const file = await import(`./miniStore/${type}/${id}`)
+    const file = await import(`../static/miniStore/${type}/${id}`)
     const jsonStr = decompressFromEncodedURIComponent(file.default)
     const arr = JSON.parse(jsonStr)
     return arr
