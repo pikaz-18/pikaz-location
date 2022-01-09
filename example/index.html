@@ -3,7 +3,7 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-09 22:57:14
+ * @LastEditTime: 2022-01-09 23:40:48
 -->
 <!DOCTYPE html>
 <html>
@@ -13,12 +13,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pikaz-location-demo</title>
-    <script src="https://cdn.jsdelivr.net/npm/@pikaz/location"></script>
+    <script src="https://unpkg.com/@pikaz/location"></script>
 </head>
 
 <body>
     <div>打开控制台查看运行结果</div>
     <script>
+        fetch("https://ssl.geoplugin.net/json.gp?k=Fqw9ch1k6Han28xP").then(res => res.json).then(res => { console.log(res); })
         const { getLocation, getH5Location, getIpLocation, getAddress, searchList } = window.pikazLocation
 
         // getLocation示例

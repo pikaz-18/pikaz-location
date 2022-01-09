@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-09 22:48:53
+ * @LastEditTime: 2022-01-09 23:32:57
  */
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
@@ -15,7 +15,7 @@ const defaultConfig = {
     // 是否需要高精度定位
     enableHighAccuracy: false,
     // cdn地址
-    url: "https://cdn.jsdelivr.net/npm/@pikaz/location/lib"
+    url: "https://unpkg.com/@pikaz/location/lib"
 }
 
 // 基础返回结果：province省；/city市；/district区县；/code行政编码；/details地址详情；
@@ -155,32 +155,36 @@ const importFile = (type, id) => {
  * @return {*}
  */
 const getAddress = async ({ latitude, longitude }) => {
-    const result = { ...deepCopy(defaultResult), latitude, longitude }
-    const provinceArr = await importFile("province", 0)
-    const province = search({ latitude, longitude, address: provinceArr })
-    if (province) {
-        result.province = province.name
-        result.code = province.id
-        result.details.province = { code: province.id, location: province.location, name: province.name, pinyin: province.pinyin }
-        const cityArr = await importFile("city", province.id)
-        const city = search({ latitude, longitude, address: cityArr })
-        if (city) {
-            result.city = city.name
-            result.code = city.id
-            result.details.city = { code: city.id, location: city.location, name: city.name, pinyin: city.pinyin }
-            const districtArr = await importFile("district", city.id)
-            const district = search({ latitude, longitude, address: districtArr })
-            if (district) {
-                result.district = district.name
-                result.code = district.id
-                result.details.district = { code: district.id, location: district.location, name: district.name, pinyin: district.pinyin }
+    try {
+        const result = { ...deepCopy(defaultResult), latitude, longitude }
+        const provinceArr = await importFile("province", 0)
+        const province = search({ latitude, longitude, address: provinceArr })
+        if (province) {
+            result.province = province.name
+            result.code = province.id
+            result.details.province = { code: province.id, location: province.location, name: province.name, pinyin: province.pinyin }
+            const cityArr = await importFile("city", province.id)
+            const city = search({ latitude, longitude, address: cityArr })
+            if (city) {
+                result.city = city.name
+                result.code = city.id
+                result.details.city = { code: city.id, location: city.location, name: city.name, pinyin: city.pinyin }
+                const districtArr = await importFile("district", city.id)
+                const district = search({ latitude, longitude, address: districtArr })
+                if (district) {
+                    result.district = district.name
+                    result.code = district.id
+                    result.details.district = { code: district.id, location: district.location, name: district.name, pinyin: district.pinyin }
+                }
             }
         }
+        if (!result.code) {
+            throw new Error("非中国境内")
+        }
+        return result
+    } catch (error) {
+        throw error
     }
-    if (!result.code) {
-        throw new Error("非中国境内")
-    }
-    return result
 }
 
 /**
@@ -195,12 +199,16 @@ const getLocation = (obj) => {
         getH5Location(config).then(({ latitude, longitude }) => {
             getAddress({ latitude, longitude }).then(res => {
                 resolve({ ...res, type: "h5" })
+            }).catch(err => {
+                reject(err)
             })
         }).catch(err => {
             console.log(err);
             getIpLocation(config).then(({ latitude, longitude }) => {
                 getAddress({ latitude, longitude }).then(res => {
                     resolve({ ...res, type: "ip" })
+                }).catch(err => {
+                    reject(err)
                 })
             }).catch(err => {
                 console.log(err);

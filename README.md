@@ -1,9 +1,9 @@
 ## 介绍
 
-供中国地区使用的定位插件
+供中国地区使用的js定位插件
 
-* 支持h5定位、ip定位、经纬度查询地址、省市区三级联动列表搜索
-* 定位信息文件已做压缩处理，如果有启用gzip时大约只会花费几十k
+* 支持浏览器h5定位、ip定位、经纬度查询地址、省市区三级联动列表搜索
+* 定位信息文件已做压缩处理，如果有启用gzip时定位大约只会花费几十k
 
 ps：由于浏览器限制，http域名的网页使用h5定位可能会出现问题，如定位不准、禁止定位等，如果想要定位结果更加精准，最好使用https域名
 
@@ -45,7 +45,7 @@ const {
 
 方法名|说明|参数|默认参数值
 -|-|-|-
-setConfig|设置全局默认参数；timeout为所有定位函数超时时间，url为定位文件cdn地址，如：https://cdn.jsdelivr.net/npm/@pikaz/location/lib或https://unpkg.com/@pikaz/location/lib|{timeout: Number/选填, url: String/选填}|{timeout:3000, url:"https://cdn.jsdelivr.net/npm/@pikaz/location/lib"}
+setConfig|设置全局默认参数；timeout为所有定位函数超时时间，url为定位文件cdn地址，如：https://cdn.jsdelivr.net/npm/@pikaz/location/lib或https://unpkg.com/@pikaz/location/lib|{timeout: Number/选填, url: String/选填}|{timeout:3000, url:"https://unpkg.com/@pikaz/location/lib"}
 getLocation|默认定位函数，优先使用html5定位，html5定位失败，则会自动切换为ip定位；timeout为超时时间，enableHighAccuracy为是否开启高精度定位（开启设备gps定位，但所需时间更久）|{timeout: Number/选填, enableHighAccuracy: Boolean/选填}|{timeout:3000, enableHighAccuracy:false}
 getH5Location|指定使用html5定位函数；timeout为超时时间，enableHighAccuracy为是否开启高精度定位（开启设备gps定位）|{timeout: Number/选填, enableHighAccuracy: Boolean/选填}|{timeout:3000, enableHighAccuracy:false}
 getIpLocation|指定使用ip定位函数; timeout为超时时间, ip为ip地址，若不传ip地址则自动获取本机ip|{timeout: Number/选填, ip: String/选填}|{timeout:3000, ip:""}
@@ -64,7 +64,7 @@ import {
 } from "@pikaz/location"
 setConfig({
     timeout: 3000,
-    url: "https://cdn.jsdelivr.net/npm/@pikaz/location/lib"
+    url: "https://unpkg.com/@pikaz/location/lib"
 })
 ```
 
