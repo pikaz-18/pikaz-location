@@ -1,9 +1,16 @@
 /*
  * @Description: 这是***页面（组件）
+ * @Date: 2022-01-09 19:34:48
+ * @Author: zouzheng
+ * @LastEditors: zouzheng
+ * @LastEditTime: 2022-01-09 20:23:09
+ */
+/*
+ * @Description: 这是***页面（组件）
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-03 23:24:32
+ * @LastEditTime: 2022-01-09 20:09:51
  */
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
@@ -74,10 +81,14 @@ const getH5Location = (obj) => {
  * @return {*}
  */
 const getIpLocation = (obj) => {
-    const { timeout } = { ...defaultConfig, ...obj }
+    const { timeout, ip } = { ...defaultConfig, ...obj }
+    let url = "http://www.geoplugin.net/json.gp"
+    if (ip) {
+        url = url + `?ip=${ip}`
+    }
     const request = () => {
         return new Promise((resolve, reject) => {
-            fetch("http://www.geoplugin.net/json.gp").then((res) => res.json()).then((res) => {
+            fetch(url).then((res) => res.json()).then((res) => {
                 resolve({ latitude: Number(res.geoplugin_latitude), longitude: Number(res.geoplugin_longitude) })
             }).catch(() => {
                 reject("ip定位失败")
@@ -118,15 +129,16 @@ const search = ({ latitude, longitude, address }) => {
  * @param {*} id/区域编码
  * @return {*}
  */
-const importFile = async (type, id) => {
-    const file = await import(`../static/miniStore/${type}/${id}`)
-    fetch(`../static/miniStore/${type}/${id}`).then(res => res.text()).then(res => {
-        console.log(res);
+const importFile = (type, id, url) => {
+    return new Promise((resolve, reject) => {
+        fetch(`${url}/static/${type}/${id}.json`).then(res => res.json()).then(file => {
+            const jsonStr = decompressFromEncodedURIComponent(file.str)
+            const arr = JSON.parse(jsonStr)
+            resolve(arr)
+        }).catch(err => {
+            reject(err)
+        })
     })
-    // const file = require(`../static/miniStore/${type}/${id}`)
-    const jsonStr = decompressFromEncodedURIComponent(file.default)
-    const arr = JSON.parse(jsonStr)
-    return arr
 }
 
 /**
