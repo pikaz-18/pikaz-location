@@ -3,7 +3,7 @@
  * @Date: 2022-01-09 19:34:48
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-09 20:23:09
+ * @LastEditTime: 2022-01-09 20:36:16
  */
 /*
  * @Description: 这是***页面（组件）
@@ -20,11 +20,23 @@ const defaultConfig = {
     // 超时时间
     timeout: 3000,
     // 是否需要高精度定位
-    enableHighAccuracy: false
+    enableHighAccuracy: false,
+    // cdn地址
+    url: "https://cdn.jsdelivr.net/npm/@pikaz/location"
 }
 
 // 基础返回结果：province省；/city市；/district区县；/code行政编码；/details地址详情；
 const defaultResult = { province: "", city: "", district: "", code: "", details: { province: { code: "", location: {}, name: "", pinyin: "" }, city: { code: "", location: {}, name: "", pinyin: "" }, district: { code: "", location: {}, name: "", pinyin: "" } } }
+
+/**
+ * @description: 设置默认值
+ * @param {*}
+ * @return {*}
+ */
+const setConfig = ({ timeout, url }) => {
+    timeout && (defaultConfig.timeout = timeout)
+    url && (defaultConfig.url = url)
+}
 
 /**
  * @description: 深拷贝
@@ -136,6 +148,7 @@ const importFile = (type, id, url) => {
             const arr = JSON.parse(jsonStr)
             resolve(arr)
         }).catch(err => {
+            console.log("文件获取失败" + err);
             reject(err)
         })
     })
@@ -147,7 +160,7 @@ const importFile = (type, id, url) => {
  * @param {*} longitude/经度
  * @return {*}
  */
-const getAddress = async ({ latitude, longitude }) => {
+const getAddress = async ({ latitude, longitude, url }) => {
     const result = { ...deepCopy(defaultResult), latitude, longitude }
     const provinceArr = await importFile("province", 0)
     const province = search({ latitude, longitude, address: provinceArr })
@@ -233,4 +246,4 @@ const searchList = async (code) => {
     return formatSearchListResult(districtArr)
 }
 
-module.exports = { getLocation, getH5Location, getIpLocation, getAddress, searchList }
+module.exports = { getLocation, getH5Location, getIpLocation, getAddress, searchList, setConfig }
