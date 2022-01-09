@@ -3,7 +3,7 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-10 00:17:04
+ * @LastEditTime: 2022-01-10 02:07:13
 -->
 <!DOCTYPE html>
 <html>
@@ -18,33 +18,48 @@
 </head>
 
 <body>
-    <div>打开控制台查看运行结果</div>
+    <div id="app">运行结果:</div>
     <script>
+
+        const show = (content) => {
+            const p = document.createElement("p");
+            const app = document.getElementById("app");
+            app.appendChild(p);
+            p.innerHTML = JSON.stringify(content)
+        }
+
         const { getLocation, getH5Location, getIpLocation, getAddress, searchList } = window.pikazLocation
 
         // getLocation示例
         getLocation().then(res => {
+            show({ "getLocation": res })
             console.log({ getLocation: res });
         }).catch(err => {
+            show({ getLocation: err })
             console.log({ getLocation: err });
         })
 
         // getH5Location示例
         getH5Location().then(res => {
+            show({ getH5Location: res })
             console.log({ getH5Location: res });
         }).catch(err => {
+            show({ getH5Location: err })
             console.log({ getH5Location: err });
         })
 
         // getIpLocation示例
         getIpLocation().then(res => {
+            show({ getIpLocation: res })
             console.log({ getIpLocation: res });
 
             // getAddress示例
             const { latitude, longitude } = res
             getAddress({ latitude, longitude }).then(res => {
+                show({ getAddress: res })
                 console.log({ getAddress: res });
             }).catch(err => {
+                show({ getAddress: err })
                 console.log({ getAddress: err });
             })
         }).catch(err => {
