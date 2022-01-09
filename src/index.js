@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-09 23:32:57
+ * @LastEditTime: 2022-01-10 00:15:51
  */
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
@@ -87,19 +87,38 @@ const getH5Location = (obj) => {
  */
 const getIpLocation = (obj) => {
     const { timeout, ip } = { ...defaultConfig, ...obj }
-    let url = "http://www.geoplugin.net/json.gp"
-    if (ip) {
-        url = url + `?ip=${ip}`
-    }
     const request = () => {
         return new Promise((resolve, reject) => {
-            fetch(url).then((res) => res.json()).then((res) => {
-                resolve({ latitude: Number(res.geoplugin_latitude), longitude: Number(res.geoplugin_longitude) })
-            }).catch(() => {
+            //创建script标签并加入到页面中
+            const head = document.getElementsByTagName("head")[0];
+            const script = document.createElement("script");
+            head.appendChild(script);
+            //创建jsonp回调函数
+            window["getIpLocation"] = (json) => {
+                head.removeChild(script);
+                clearTimeout(script.timer);
+                window["getIpLocation"] = null;
+                if (json.lat && json.lon) {
+                    resolve({ latitude: Number(json.lat), longitude: Number(json.lon) })
+                    return
+                }
                 reject("ip定位失败")
-            });
+            };
+            //设置超时处理
+            script.timer = setTimeout(() => {
+                window["getIpLocation"] = null;
+                head.removeChild(script);
+                reject("ip定位超时")
+            }, timeout);
+            //发送请求
+            if (ip) {
+                script.src = `http://ip-api.com/json/${ip}?callback=getIpLocation`;
+                return
+            }
+            script.src = `http://ip-api.com/json?callback=getIpLocation`;
         })
     }
+    // 整体超时处理
     const timeoutFuc = (timeout) => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
