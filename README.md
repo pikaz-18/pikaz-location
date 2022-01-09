@@ -48,7 +48,7 @@ const {
 setConfig|设置全局默认参数；timeout为所有定位函数超时时间，url为定位文件cdn地址，如：https://cdn.jsdelivr.net/npm/@pikaz/location/lib或https://unpkg.com/@pikaz/location/lib|{timeout: Number/选填, url: String/选填}|{timeout:3000, url:"https://unpkg.com/@pikaz/location/lib"}
 getLocation|默认定位函数，优先使用html5定位，html5定位失败，则会自动切换为ip定位；timeout为超时时间，enableHighAccuracy为是否开启高精度定位（开启设备gps定位，但所需时间更久）|{timeout: Number/选填, enableHighAccuracy: Boolean/选填}|{timeout:3000, enableHighAccuracy:false}
 getH5Location|指定使用html5定位函数；timeout为超时时间，enableHighAccuracy为是否开启高精度定位（开启设备gps定位）|{timeout: Number/选填, enableHighAccuracy: Boolean/选填}|{timeout:3000, enableHighAccuracy:false}
-getIpLocation|指定使用ip定位函数; timeout为超时时间, ip为ip地址，若不传ip地址则自动获取本机ip|{timeout: Number/选填, ip: String/选填}|{timeout:3000, ip:""}
+getIpLocation|指定使用ip定位函数; timeout为超时时间|{timeout: Number/选填}|{timeout:3000}
 getAddress|根据经纬度获取具体地址；latitude为纬度，longitude为经度|{ latitude: Number/必填, longitude : Number/必填}|{ latitude: 0, longitude : 0}
 searchList|省市区三级联动，传入地区行政编码返回下级地区列表信息，code为地区编码，不传则为查询省级列表|code: String/选填|code:""
 
@@ -138,15 +138,14 @@ getH5Location({
 
 #### getIpLocation
 
-说明：ip定位函数，ip定位相比html5定位精准度更差，但是若用户拒绝定位授权时，则可以使用ip定位作为兜底方案；可传入ip值查询指定ip的经纬度，若不传则默认为本机ip；该函数只会返回经纬度，若需具体地址，可配合getAddress函数获取具体地址
+说明：ip定位函数，ip定位相比html5定位精准度更差，只精确到市，但是若用户拒绝定位授权时，则可以使用ip定位作为兜底方案；该函数只会返回经纬度，若需具体地址，可配合getAddress函数获取具体地址
 
 ```js
 import {
     getIpLocation
 } from "@pikaz/location"
 getIpLocation({
-    timeout: 3000,
-    ip: ""
+    timeout: 3000
 }).then(res => {
     console.log(res)
     // 返回值结构: {

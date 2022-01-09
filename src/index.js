@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-10 00:15:51
+ * @LastEditTime: 2022-01-10 01:25:55
  */
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
@@ -86,36 +86,42 @@ const getH5Location = (obj) => {
  * @return {*}
  */
 const getIpLocation = (obj) => {
-    const { timeout, ip } = { ...defaultConfig, ...obj }
+    const { timeout } = { ...defaultConfig, ...obj }
     const request = () => {
         return new Promise((resolve, reject) => {
             //创建script标签并加入到页面中
             const head = document.getElementsByTagName("head")[0];
             const script = document.createElement("script");
             head.appendChild(script);
-            //创建jsonp回调函数
-            window["getIpLocation"] = (json) => {
-                head.removeChild(script);
-                clearTimeout(script.timer);
-                window["getIpLocation"] = null;
-                if (json.lat && json.lon) {
-                    resolve({ latitude: Number(json.lat), longitude: Number(json.lon) })
-                    return
-                }
-                reject("ip定位失败")
-            };
             //设置超时处理
             script.timer = setTimeout(() => {
                 window["getIpLocation"] = null;
                 head.removeChild(script);
                 reject("ip定位超时")
             }, timeout);
-            //发送请求
-            if (ip) {
-                script.src = `http://ip-api.com/json/${ip}?callback=getIpLocation`;
-                return
+            script.src = window.location.protocol + `//pv.sohu.com/cityjson?ie=utf-8`;
+            script.onload = () => {
+                head.removeChild(script);
+                clearTimeout(script.timer);
+                if (returnCitySN && returnCitySN.cid) {
+                    // 精确到区
+                    const code = returnCitySN.cid.slice(0, 4) + "00"
+                    const id = returnCitySN.cid.slice(0, 2) + "0000"
+                    importFile("city", id).then(res => {
+                        const item = res.find(address => address.id === code)
+                        if (item) {
+                            resolve(item.location)
+                            return
+                        }
+                        reject("ip定位失败")
+                    }).catch(err => {
+                        console.log(err);
+                        reject("ip定位失败")
+                    })
+                    return
+                }
+                reject("ip定位失败")
             }
-            script.src = `http://ip-api.com/json?callback=getIpLocation`;
         })
     }
     // 整体超时处理
