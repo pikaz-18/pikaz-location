@@ -3,7 +3,7 @@
  * @Date: 2022-01-09 19:34:48
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-09 20:36:16
+ * @LastEditTime: 2022-01-09 20:38:14
  */
 /*
  * @Description: 这是***页面（组件）
@@ -141,7 +141,8 @@ const search = ({ latitude, longitude, address }) => {
  * @param {*} id/区域编码
  * @return {*}
  */
-const importFile = (type, id, url) => {
+const importFile = (type, id) => {
+    const url = defaultConfig.url
     return new Promise((resolve, reject) => {
         fetch(`${url}/static/${type}/${id}.json`).then(res => res.json()).then(file => {
             const jsonStr = decompressFromEncodedURIComponent(file.str)
