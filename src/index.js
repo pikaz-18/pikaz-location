@@ -3,7 +3,7 @@
  * @Date: 2022-01-09 19:34:48
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-09 20:38:14
+ * @LastEditTime: 2022-01-09 21:08:03
  */
 /*
  * @Description: 这是***页面（组件）
@@ -22,7 +22,7 @@ const defaultConfig = {
     // 是否需要高精度定位
     enableHighAccuracy: false,
     // cdn地址
-    url: "https://cdn.jsdelivr.net/npm/@pikaz/location"
+    url: "https://cdn.jsdelivr.net/npm/@pikaz/location/lib"
 }
 
 // 基础返回结果：province省；/city市；/district区县；/code行政编码；/details地址详情；
@@ -145,7 +145,7 @@ const importFile = (type, id) => {
     const url = defaultConfig.url
     return new Promise((resolve, reject) => {
         fetch(`${url}/static/${type}/${id}.json`).then(res => res.json()).then(file => {
-            const jsonStr = decompressFromEncodedURIComponent(file.str)
+            const jsonStr = decompressFromEncodedURIComponent(file.s)
             const arr = JSON.parse(jsonStr)
             resolve(arr)
         }).catch(err => {
@@ -161,7 +161,7 @@ const importFile = (type, id) => {
  * @param {*} longitude/经度
  * @return {*}
  */
-const getAddress = async ({ latitude, longitude, url }) => {
+const getAddress = async ({ latitude, longitude }) => {
     const result = { ...deepCopy(defaultResult), latitude, longitude }
     const provinceArr = await importFile("province", 0)
     const province = search({ latitude, longitude, address: provinceArr })
@@ -183,6 +183,9 @@ const getAddress = async ({ latitude, longitude, url }) => {
                 result.details.district = { code: district.id, location: district.location, name: district.name, pinyin: district.pinyin }
             }
         }
+    }
+    if (!result.code) {
+        throw new Error("非中国境内")
     }
     return result
 }
@@ -231,20 +234,24 @@ const formatSearchListResult = (list) => {
  * @return {*}
  */
 const searchList = async (code) => {
-    // 省级
-    if (!code) {
-        const provinceArr = await importFile("province", 0)
-        return formatSearchListResult(provinceArr)
+    try {
+        // 省级
+        if (!code) {
+            const provinceArr = await importFile("province", 0)
+            return formatSearchListResult(provinceArr)
+        }
+        const id = code.toString()
+        // 市级
+        if (id.slice(2) === "0000") {
+            const cityArr = await importFile("city", code)
+            return formatSearchListResult(cityArr)
+        }
+        // 区、县
+        const districtArr = await importFile("district", code)
+        return formatSearchListResult(districtArr)
+    } catch (error) {
+        throw error
     }
-    const id = code.toString()
-    // 市级
-    if (id.slice(2) === "0000") {
-        const cityArr = await importFile("city", code)
-        return formatSearchListResult(cityArr)
-    }
-    // 区、县
-    const districtArr = await importFile("district", code)
-    return formatSearchListResult(districtArr)
 }
 
 module.exports = { getLocation, getH5Location, getIpLocation, getAddress, searchList, setConfig }
