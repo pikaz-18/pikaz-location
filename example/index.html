@@ -21,18 +21,18 @@
     <div id="app">运行结果:</div>
     <script>
 
-        const show = (content) => {
+        const show = (name,content) => {
             const p = document.createElement("p");
             const app = document.getElementById("app");
             app.appendChild(p);
-            p.innerHTML = JSON.stringify(content)
+            p.innerHTML = name+":"+JSON.stringify(content)
         }
 
         const { getLocation, getH5Location, getIpLocation, getAddress, searchList } = window.pikazLocation
 
         // getLocation示例
         getLocation().then(res => {
-            show({ "默认定位": res })
+            show("默认定位",res)
             console.log({ getLocation: res });
         }).catch(err => {
             show({ "默认定位": err })
