@@ -3,7 +3,7 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-11 00:27:47
+ * @LastEditTime: 2022-01-11 01:05:35
 -->
 <!DOCTYPE html>
 <html>
@@ -59,14 +59,14 @@
             // getAddress示例
             const { latitude, longitude } = res
             getAddress({ latitude, longitude }).then(res => {
-                show("ip定位(仅精确到市)", res)
+                show("ip定位(不精准)", res)
                 console.log({ getAddress: res });
             }).catch(err => {
-                show("ip定位(仅精确到市)", err)
+                show("ip定位(不精准)", err)
                 console.log({ getAddress: err });
             })
         }).catch(err => {
-            show("ip定位(仅精确到市)", err)
+            show("ip定位(不精准)", err)
             console.log({ getIpLocation: err });
         })
 
