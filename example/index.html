@@ -53,8 +53,10 @@
             // getAddress示例
             const { latitude, longitude } = res
             getAddress({ latitude, longitude }).then(res => {
+                show("ip定位(仅精确到市)",res)
                 console.log({ getAddress: res });
             }).catch(err => {
+                show("ip定位(仅精确到市)",err)
                 console.log({ getAddress: err });
             })
         }).catch(err => {
