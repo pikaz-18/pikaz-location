@@ -60,6 +60,7 @@
                 console.log({ getAddress: err });
             })
         }).catch(err => {
+            show("ip定位(仅精确到市)",err)
             console.log({ getIpLocation: err });
         })
 
