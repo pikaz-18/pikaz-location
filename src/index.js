@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-10 01:25:55
+ * @LastEditTime: 2022-01-11 00:31:20
  */
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
@@ -81,47 +81,108 @@ const getH5Location = (obj) => {
 }
 
 /**
+ * @description: ip定位获取code
+ * @param {*}
+ * @return {*}
+ */
+const sohuIpLocation = (timeout) => {
+    return new Promise((resolve, reject) => {
+        //创建script标签并加入到页面中
+        const head = document.getElementsByTagName("head")[0];
+        const script = document.createElement("script");
+        head.appendChild(script);
+        script.src = window.location.protocol + `//pv.sohu.com/cityjson?ie=utf-8`;
+        script.onload = () => {
+            if (returnCitySN && returnCitySN.cid) {
+                resolve(returnCitySN.cid)
+                return
+            }
+            reject("ip定位失败")
+        }
+        script.onerror = () => {
+            reject("ip定位失败")
+        }
+        setTimeout(() => {
+            head.removeChild(script);
+        }, timeout);
+    })
+}
+
+/**
+ * @description: ip定位获取code
+ * @param {*}
+ * @return {*}
+ */
+const pconlineIpLocation = (timeout) => {
+    return new Promise((resolve, reject) => {
+        //创建script标签并加入到页面中
+        const head = document.getElementsByTagName("head")[0];
+        const script = document.createElement("script");
+        head.appendChild(script);
+        window.IPCallBack = (res) => {
+            if (res && res.cityCode) {
+                resolve(res.cityCode)
+                return
+            }
+            reject("ip定位失败")
+        }
+        script.src = window.location.protocol + `//whois.pconline.com.cn/ipJson.jsp?callback=IPCallBack`;
+        script.onerror = () => {
+            reject("ip定位失败")
+        }
+        setTimeout(() => {
+            head.removeChild(script);
+        }, timeout);
+    })
+}
+
+/**
  * @description: ip定位
  * @param {*}timeout/超时时间
  * @return {*}
  */
 const getIpLocation = (obj) => {
     const { timeout } = { ...defaultConfig, ...obj }
-    const request = () => {
+    // 通过code获取经纬度
+    const getLoc = (originCode) => {
         return new Promise((resolve, reject) => {
-            //创建script标签并加入到页面中
-            const head = document.getElementsByTagName("head")[0];
-            const script = document.createElement("script");
-            head.appendChild(script);
-            //设置超时处理
-            script.timer = setTimeout(() => {
-                window["getIpLocation"] = null;
-                head.removeChild(script);
-                reject("ip定位超时")
-            }, timeout);
-            script.src = window.location.protocol + `//pv.sohu.com/cityjson?ie=utf-8`;
-            script.onload = () => {
-                head.removeChild(script);
-                clearTimeout(script.timer);
-                if (returnCitySN && returnCitySN.cid) {
-                    // 精确到区
-                    const code = returnCitySN.cid.slice(0, 4) + "00"
-                    const id = returnCitySN.cid.slice(0, 2) + "0000"
-                    importFile("city", id).then(res => {
-                        const item = res.find(address => address.id === code)
-                        if (item) {
-                            resolve(item.location)
-                            return
-                        }
-                        reject("ip定位失败")
-                    }).catch(err => {
-                        console.log(err);
-                        reject("ip定位失败")
-                    })
+            // 市
+            const code = originCode.slice(0, 4) + "00"
+            // 省
+            const id = originCode.slice(0, 2) + "0000"
+            importFile("city", id).then(res => {
+                const item = res.find(address => address.id === code || address.id === originCode)
+                if (item) {
+                    resolve(item.location)
                     return
                 }
-                reject("ip定位失败")
-            }
+                reject("code不存在")
+            }).catch(() => {
+                reject("code不存在")
+            })
+        })
+    }
+    // ip定位
+    const request = () => {
+        return new Promise((resolve, reject) => {
+            pconlineIpLocation(timeout).then(originCode => {
+                getLoc(originCode).then(res => {
+                    resolve(res)
+                }).catch(err => {
+                    reject(err)
+                })
+            }).catch(() => {
+                // 备用ip定位
+                sohuIpLocation(timeout).then(originCode => {
+                    getLoc(originCode).then(res => {
+                        resolve(res)
+                    }).catch(err => {
+                        reject(err)
+                    })
+                }).catch(err => {
+                    reject(err)
+                })
+            })
         })
     }
     // 整体超时处理

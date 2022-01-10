@@ -3,7 +3,7 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-10 02:07:13
+ * @LastEditTime: 2022-01-11 00:27:47
 -->
 <!DOCTYPE html>
 <html>
@@ -21,28 +21,34 @@
     <div id="app">运行结果:</div>
     <script>
 
-        const show = (name,content) => {
+        const show = (name, content) => {
             const p = document.createElement("p");
             const app = document.getElementById("app");
             app.appendChild(p);
-            p.innerHTML = name+":"+JSON.stringify(content)
+            p.innerHTML = name + ":" + JSON.stringify(content)
         }
 
         const { getLocation, getH5Location, getIpLocation, getAddress, searchList } = window.pikazLocation
 
         // getLocation示例
         getLocation().then(res => {
-            show("默认定位",res)
             console.log({ getLocation: res });
         }).catch(err => {
-            show({ "默认定位": err })
             console.log({ getLocation: err });
         })
 
         // getH5Location示例
-        getH5Location().then(res => {
+        getH5Location({ enableHighAccuracy: true }).then(res => {
             console.log({ getH5Location: res });
+            // getAddress示例
+            const { latitude, longitude } = res
+            getAddress({ latitude, longitude }).then(res => {
+                show("h5定位", res)
+            }).catch(err => {
+                show("h5定位", err)
+            })
         }).catch(err => {
+            show("h5定位", err)
             console.log({ getH5Location: err });
         })
 
@@ -53,14 +59,14 @@
             // getAddress示例
             const { latitude, longitude } = res
             getAddress({ latitude, longitude }).then(res => {
-                show("ip定位(仅精确到市)",res)
+                show("ip定位(仅精确到市)", res)
                 console.log({ getAddress: res });
             }).catch(err => {
-                show("ip定位(仅精确到市)",err)
+                show("ip定位(仅精确到市)", err)
                 console.log({ getAddress: err });
             })
         }).catch(err => {
-            show("ip定位(仅精确到市)",err)
+            show("ip定位(仅精确到市)", err)
             console.log({ getIpLocation: err });
         })
 
