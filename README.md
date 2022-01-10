@@ -13,7 +13,7 @@ ps：
 
 * 该插件的定位文件存放在第三方cdn中，若想存放至自己的cdn上，则可参考setConfig函数使用方法介绍
 
-## [demo](https://pikaz-18.github.io/pikaz-location/example/index.html)
+## [demo示例](https://pikaz-18.github.io/pikaz-location/example/index.html)
 
 ### [demo代码](https://github.com/pikaz-18/pikaz-location/blob/master/example/index.html)
 
