@@ -32,34 +32,29 @@
 
         // getLocation示例
         getLocation().then(res => {
-            show({ "getLocation": res })
+            show({ "默认定位": res })
             console.log({ getLocation: res });
         }).catch(err => {
-            show({ getLocation: err })
+            show({ "默认定位": err })
             console.log({ getLocation: err });
         })
 
         // getH5Location示例
         getH5Location().then(res => {
-            show({ getH5Location: res })
             console.log({ getH5Location: res });
         }).catch(err => {
-            show({ getH5Location: err })
             console.log({ getH5Location: err });
         })
 
         // getIpLocation示例
         getIpLocation().then(res => {
-            show({ getIpLocation: res })
             console.log({ getIpLocation: res });
 
             // getAddress示例
             const { latitude, longitude } = res
             getAddress({ latitude, longitude }).then(res => {
-                show({ getAddress: res })
                 console.log({ getAddress: res });
             }).catch(err => {
-                show({ getAddress: err })
                 console.log({ getAddress: err });
             })
         }).catch(err => {
