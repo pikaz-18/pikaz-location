@@ -62,7 +62,7 @@ searchList|省市区三级联动，传入地区行政编码返回下级地区列
 
 #### setConfig
 
-说明：设置全局默认参数，可把该项目的根目录下的static文件夹上传至至您的oss或服务器上，将static所在的地址作为url传入，如oss上的static文件夹可通过https://xxx.com/file/static访问，则url可传入https://xxx.com/file，若不设置，则url默认使用https://cdn.jsdelivr.net/npm/@pikaz/location/lib地址（第三方cdn可能不稳定，最好自行上传定位文件）
+说明：设置全局默认参数，可把该项目的根目录下的static文件夹上传至至您的oss或服务器上，将static所在的地址作为url传入，如oss上的static文件夹可通过https://xxx.com/file/static访问，则url可传入https://xxx.com/file，若不设置，则url默认使用https://unpkg.com/@pikaz/location/lib地址（第三方cdn可能不稳定，最好自行上传定位文件）
 
 ```js
 import {
