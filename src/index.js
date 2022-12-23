@@ -8,16 +8,6 @@
 const pointInPolygon = require("point-in-polygon/flat")
 const { decompressFromEncodedURIComponent } = require("lz-string")
 
-// 默认配置
-const defaultConfig = {
-    // 超时时间
-    timeout: 3000,
-    // 是否需要高精度定位
-    enableHighAccuracy: false,
-    // cdn地址
-    url: "https://unpkg.com/@pikaz/location/lib"
-}
-
 // 基础返回结果：province省；/city市；/district区县；/code行政编码；/details地址详情；
 const defaultResult = { province: "", city: "", district: "", code: "", details: { province: { code: "", location: {}, name: "", pinyin: "" }, city: { code: "", location: {}, name: "", pinyin: "" }, district: { code: "", location: {}, name: "", pinyin: "" } } }
 
@@ -355,5 +345,7 @@ const searchList = async (code) => {
         throw error
     }
 }
+
+
 
 module.exports = { getLocation, getH5Location, getIpLocation, getAddress, searchList, setConfig }

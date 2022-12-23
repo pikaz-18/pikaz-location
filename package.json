@@ -1,11 +1,13 @@
 {
   "name": "@pikaz/location",
-  "version": "0.1.7",
-  "description": "geolocation plugin",
+  "version": "0.2.0",
+  "fileVersion": "0.1.0",
+  "description": "used to obtain location from the browser",
   "private": false,
   "main": "lib/pikazLocation.js",
   "scripts": {
     "compress": "node utils/compress.js",
+    "analysisip": "node utils/analysisIp.js",
     "build": "webpack"
   },
   "keywords": [
@@ -40,6 +42,7 @@
     "webpack-cli": "^4.9.1"
   },
   "dependencies": {
+    "localforage": "^1.10.0",
     "lz-string": "^1.4.4",
     "point-in-polygon": "^1.1.0"
   }

@@ -1,9 +1,9 @@
 /*
- * @Description: 这是压缩地理信息文件页面（组件）
+ * @Description: 这是压缩文件工具（组件）
  * @Date: 2022-01-01 17:17:04
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-09 21:54:50
+ * @LastEditTime: 2022-12-21 11:12:20
  */
 const fs = require("fs")
 const path = require("path")
