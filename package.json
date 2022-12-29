@@ -1,7 +1,6 @@
 {
   "name": "@pikaz/location",
   "version": "0.2.0",
-  "fileVersion": "0.1.0",
   "description": "used to obtain location from the browser",
   "private": false,
   "main": "lib/pikazLocation.js",
@@ -38,6 +37,7 @@
   "devDependencies": {
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^10.2.0",
+    "object-hash": "^3.0.0",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
   },
@@ -45,5 +45,7 @@
     "localforage": "^1.10.0",
     "lz-string": "^1.4.4",
     "point-in-polygon": "^1.1.0"
-  }
+  },
+  "fileDate": "20221228168",
+  "fileCode": "bd835b7f400aa4422a0e1e4ba39adbf43ec22291"
 }

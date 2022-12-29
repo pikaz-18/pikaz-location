@@ -3,34 +3,16 @@
  * @Date: 2022-12-21 11:07:13
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-12-21 15:01:15
+ * @LastEditTime: 2022-12-28 15:51:14
  */
 const fs = require("fs");
 const path = require("path")
 const areaList = require("../store/areaList/index.json")
 const { addZero } = require("../src/ip")
 const { searchAddress } = require("../src/code")
+const { removeDir } = require("./common")
 
 const projectPath = process.cwd()
-
-/**
- * @description: 删除文件夹
- * @param {*} dir/文件夹地址
- * @return {*}
- */
-function removeDir(dir) {
-    const arr = fs.readdirSync(dir)
-    arr.forEach(v => {
-        v = dir + "/" + v
-        const info = fs.statSync(v)
-        if (info.isFile()) {
-            fs.unlinkSync(v)
-        } else {
-            removeDir(v)
-        }
-    })
-    fs.rmdirSync(dir)
-}
 
 /**
  * @description: 获取至少市级code
