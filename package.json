@@ -1,6 +1,6 @@
 {
   "name": "@pikaz/location",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "used to obtain location from the browser",
   "private": false,
   "main": "lib/pikazLocation.js",
@@ -46,6 +46,18 @@
     "lz-string": "^1.4.4",
     "point-in-polygon": "^1.1.0"
   },
-  "fileDate": "20221228168",
-  "fileCode": "bd835b7f400aa4422a0e1e4ba39adbf43ec22291"
+  "fileDate": {
+    "areaList": "202212301139",
+    "city": "202212301139",
+    "district": "202212301139",
+    "ip": "202212301139",
+    "province": "202212301139"
+  },
+  "fileCode": {
+    "areaList": "64b5a33f94b14ae208fca152fdc89dca1048360a",
+    "city": "7827eb2bc906b83df109ab24242ce68f98f9558b",
+    "district": "14d77ce6236e2025a4b1e3900cc70d0c32a62d0b",
+    "ip": "2f0f91cb79c29f34d78b6fbb6d6003c72b0a96fc",
+    "province": "eb502058a39fc7497890103957f74be2df617198"
+  }
 }

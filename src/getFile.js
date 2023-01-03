@@ -1,15 +1,14 @@
 /*
- * @Description: 这是***页面（组件）
+ * @Description: 这是获取文件页面（组件）
  * @Date: 2022-12-21 15:05:38
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-12-28 18:04:22
+ * @LastEditTime: 2023-01-03 10:59:11
  */
 const { decompressFromEncodedURIComponent } = require("lz-string")
 const localforage = require("localforage")
 const config = require("./config")
-// 文件版本
-const { fileDate } = require("../package.json")
+const { version, fileDate } = require("../package.json")
 
 /**
  * @description: 获取远程文件
@@ -39,7 +38,9 @@ class GetFile {
     constructor() {
         this.local = null;
         this.localConfig = {
-            name: "pikazLocation", storeName: "v" + fileDate
+            name: "pikazLocation",
+            // 没有文件系统破坏性更新时则不更新大版本
+            storeName: "v" + version.split(".")[0]
         };
     }
     /**
@@ -55,7 +56,7 @@ class GetFile {
             this.local = local
         }
         // 先从本地拿
-        const name = `${dir}@${file}`
+        const name = `${dir}-${file}-${fileDate[dir]}`
         const localResult = await this.local.getItem(name)
         if (localResult) {
             return localResult
@@ -88,7 +89,7 @@ class GetFile {
         const now = new Date().getTime()
         // 过期时长
         const time = expiration || 0
-        const name = `local@${key}`
+        const name = `local-${key}`
         const localResult = await this.local.getItem(name)
         if (localResult) {
             // 未过期

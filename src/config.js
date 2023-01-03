@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 15:10:22
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-12-21 17:06:45
+ * @LastEditTime: 2023-01-03 15:32:45
  */
 class Config {
     constructor() {
@@ -13,6 +13,8 @@ class Config {
             timeout: 10000,
             // 是否需要高精度定位
             enableHighAccuracy: false,
+            // 是否返回详细信息
+            detail: false
         }
         // cdn链接地址列表
         this.cdn = ["https://unpkg.com/@pikaz/location/lib", "https://cdn.jsdelivr.net/npm/@pikaz/location/lib"]

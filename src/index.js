@@ -3,349 +3,143 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-11 01:10:52
+ * @LastEditTime: 2023-01-03 17:52:12
  */
-const pointInPolygon = require("point-in-polygon/flat")
-const { decompressFromEncodedURIComponent } = require("lz-string")
-
-// 基础返回结果：province省；/city市；/district区县；/code行政编码；/details地址详情；
-const defaultResult = { province: "", city: "", district: "", code: "", details: { province: { code: "", location: {}, name: "", pinyin: "" }, city: { code: "", location: {}, name: "", pinyin: "" }, district: { code: "", location: {}, name: "", pinyin: "" } } }
+const config = require("./config")
+const { getGeo, getGeoCode } = require("./geo")
+const { getList, searchCodeInfo, searchStrAddress } = require("./code")
+const { getIpCode } = require("./ip")
 
 /**
- * @description: 设置默认值
- * @param {*}
+ * @description: 超时处理
+ * @param {*} fuc
+ * @param {*} timeout/超时时间（单位毫秒）
+ * @return {*}
+ */
+const timeoutFuc = async (fuc, params = {}) => {
+    let { timeout } = { ...config.config, ...params }
+    const timeRace = () => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                reject("定位超时")
+            }, timeout);
+        })
+    }
+    const result = await Promise.race([fuc(params), timeRace()])
+    return result
+}
+
+/**
+ * @description: 设置全局默认参数
+ * @param {*} timeout/超时时间（单位毫秒）
+ * @param {*} url/cdn地址
  * @return {*}
  */
 const setConfig = ({ timeout, url }) => {
-    timeout && (defaultConfig.timeout = timeout)
-    url && (defaultConfig.url = url)
+    config.set({ timeout, url })
 }
 
 /**
- * @description: 深拷贝
- * @param {*}
+ * @description: h5定位
+ * @param {*} timeout/超时时间（单位毫秒）
+ * @param {*} enableHighAccuracy/是否开启高精度定位
+ * @param {*} detail/是否需要详细信息
+ * @param {*} latitude/纬度
+ * @param {*} longitude/经度
  * @return {*}
  */
-const deepCopy = (obj) => {
-    const oldObj = JSON.stringify(obj)
-    const newObj = JSON.parse(oldObj)
-    return newObj
-}
-
-/**
- * @description: html5定位
- * @param {*}timeout/超时时间
- * @param {*}enableHighAccuracy/是否需要高精度定位
- * @return {*}
- */
-const getH5Location = (obj) => {
-    const { timeout, enableHighAccuracy } = { ...defaultConfig, ...obj }
-    return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            const id = navigator.geolocation.watchPosition((e) => {
-                // 纬度，经度
-                const { latitude, longitude } = e.coords;
-                navigator.geolocation.clearWatch(id);
-                resolve({ latitude, longitude })
-            }, (error) => {
-                navigator.geolocation.clearWatch(id);
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        reject("html5已拒绝定位")
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        reject("html5位置信息不可用")
-                        break;
-                    case error.TIMEOUT:
-                        reject("html5定位超时")
-                        break;
-                    case error.UNKNOWN_ERROR:
-                        reject("html5定位未知错误")
-                        break;
-                }
-            }, { enableHighAccuracy, timeout, maximumAge: 0 });
-            return
-        }
-        reject("浏览器不支持HTML5定位")
-    })
-}
-
-/**
- * @description: 通过code获取经纬度
- * @param {*}
- * @return {*}
- */
-const getCodeLocation = (originCode) => {
-    return new Promise((resolve, reject) => {
-        // 市
-        const code = originCode.slice(0, 4) + "00"
-        // 省
-        const id = originCode.slice(0, 2) + "0000"
-        importFile("city", id).then(res => {
-            const item = res.find(address => address.id === code || address.id === originCode)
-            if (item) {
-                resolve(item.location)
-                return
-            }
-            reject("code不存在")
-        }).catch(() => {
-            reject("code不存在")
-        })
-    })
-}
-
-/**
- * @description: ip定位获取经纬度
- * @param {*}
- * @return {*}
- */
-const sohuIpLocation = (timeout) => {
-    return new Promise((resolve, reject) => {
-        //创建script标签并加入到页面中
-        const head = document.getElementsByTagName("head")[0];
-        const script = document.createElement("script");
-        head.appendChild(script);
-        script.src = window.location.protocol + `//pv.sohu.com/cityjson?ie=utf-8`;
-        script.onload = () => {
-            if (returnCitySN && returnCitySN.cid) {
-                getCodeLocation(returnCitySN.cid).then(res => {
-                    resolve(res)
-                }).catch(err => {
-                    reject(err)
-                })
-                return
-            }
-            reject("ip定位失败")
-        }
-        script.onerror = () => {
-            reject("ip定位失败")
-        }
-        setTimeout(() => {
-            head.removeChild(script);
-        }, timeout);
-    })
-}
-
-/**
- * @description: 备用ip获取经纬度
- * @param {*}
- * @return {*}
- */
-const ipquery = (timeout) => {
-    return new Promise((resolve, reject) => {
-        //创建script标签并加入到页面中
-        const head = document.getElementsByTagName("head")[0];
-        const script = document.createElement("script");
-        head.appendChild(script);
-        script.src = window.location.protocol + `//ip.ws.126.net/ipquery`;
-        script.onload = () => {
-            if (window.lo && window.lc) {
-                importFile("province", 0).then(res => {
-                    const item = res.find(province => province.name === window.lo)
-                    if (item) {
-                        importFile("city", item.id).then(res => {
-                            const cItem = res.find(city => city.name === window.lc)
-                            if (cItem) {
-                                resolve(cItem.location)
-                                return
-                            }
-                            reject("code不存在")
-                        })
-                        return
-                    }
-                    reject("code不存在")
-                })
-                return
-            }
-            reject("ip定位失败")
-        }
-        script.onerror = () => {
-            reject("ip定位失败")
-        }
-        setTimeout(() => {
-            head.removeChild(script);
-        }, timeout);
-    })
+const getH5Location = async (obj = {}) => {
+    let { timeout, enableHighAccuracy, detail, latitude, longitude } = { ...config.config, ...obj }
+    // 不传经纬度，则使用浏览器定位
+    if (!(latitude && longitude)) {
+        const { latitude: lat, longitude: lon } = await getGeo({ timeout, enableHighAccuracy })
+        latitude = lat
+        longitude = lon
+    }
+    const code = await getGeoCode({ latitude, longitude })
+    if (!code) {
+        throw new Error("非中国境内")
+    }
+    const result = await searchCodeInfo({ code, detail })
+    return { ...result, latitude, longitude }
 }
 
 /**
  * @description: ip定位
- * @param {*}timeout/超时时间
+ * @param {*} detail/是否需要详细信息
+ * @param {*} ip/ip地址
  * @return {*}
  */
-const getIpLocation = (obj) => {
-    const { timeout } = { ...defaultConfig, ...obj }
-    // ip定位
-    const request = () => {
-        return new Promise((resolve, reject) => {
-            sohuIpLocation(timeout).then(res => {
-                resolve(res)
-            }).catch(() => {
-                // 备用ip定位
-                ipquery(timeout).then(res => {
-                    resolve(res)
-                }).catch(err => {
-                    reject(err)
-                })
-            })
-        })
+const getIpLocation = async (obj = {}) => {
+    let { detail, ip } = { ...config.config, ...obj }
+    // 不传ip则获取本机ip
+    const { code, ip: localIp } = await getIpCode({ ip })
+    if (!ip) {
+        ip = localIp
     }
-    // 整体超时处理
-    const timeoutFuc = (timeout) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                reject("ip定位超时")
-            }, timeout);
-        })
-    }
-    return Promise.race([request(), timeoutFuc(timeout)])
+    const result = await searchCodeInfo({ code, detail })
+    return { ...result, ip }
 }
 
 /**
- * @description: 经纬度查询地址
- * @param {*} latitude/纬度
- * @param {*} longitude/经度
- * @param {*}address/地区数组
+ * @description: 获取定位（优先使用浏览器定位，若失败，则使用ip定位）
+ * @param {*} obj
  * @return {*}
  */
-const search = ({ latitude, longitude, address }) => {
-    return address.find(item => {
-        return item.polygon.find(poly => {
-            const check = pointInPolygon([longitude, latitude], poly)
-            if (check) {
-                return poly
-            }
-        })
-    })
-}
-
-/**
- * @description: 引入文件
- * @param {*} type/区域类型
- * @param {*} id/区域编码
- * @return {*}
- */
-const importFile = (type, id) => {
-    const url = defaultConfig.url
-    return new Promise((resolve, reject) => {
-        fetch(`${url}/static/${type}/${id}.json`).then(res => res.json()).then(file => {
-            const jsonStr = decompressFromEncodedURIComponent(file.s)
-            const arr = JSON.parse(jsonStr)
-            resolve(arr)
-        }).catch(err => {
-            console.log("文件获取失败" + err);
-            reject(err)
-        })
-    })
-}
-
-/**
- * @description: 获取地址
- * @param {*} latitude/纬度
- * @param {*} longitude/经度
- * @return {*}
- */
-const getAddress = async ({ latitude, longitude }) => {
+const getLocation = async (obj = {}) => {
     try {
-        const result = { ...deepCopy(defaultResult), latitude, longitude }
-        const provinceArr = await importFile("province", 0)
-        const province = search({ latitude, longitude, address: provinceArr })
-        if (province) {
-            result.province = province.name
-            result.code = province.id
-            result.details.province = { code: province.id, location: province.location, name: province.name, pinyin: province.pinyin }
-            const cityArr = await importFile("city", province.id)
-            const city = search({ latitude, longitude, address: cityArr })
-            if (city) {
-                result.city = city.name
-                result.code = city.id
-                result.details.city = { code: city.id, location: city.location, name: city.name, pinyin: city.pinyin }
-                const districtArr = await importFile("district", city.id)
-                const district = search({ latitude, longitude, address: districtArr })
-                if (district) {
-                    result.district = district.name
-                    result.code = district.id
-                    result.details.district = { code: district.id, location: district.location, name: district.name, pinyin: district.pinyin }
-                }
-            }
-        }
-        if (!result.code) {
-            throw new Error("非中国境内")
-        }
-        return result
+        const result = await timeoutFuc(getH5Location, obj)
+        return { ...result, type: "h5" }
     } catch (error) {
-        throw error
+        const result = await timeoutFuc(getIpLocation, obj)
+        return { ...result, type: "ip" }
     }
-}
-
-/**
- * @description: 定位
- * @param {*}timeout/超时时间
- * @param {*}enableHighAccuracy/是否需要高精度定位
- * @return {*}
- */
-const getLocation = (obj) => {
-    const config = { ...defaultConfig, ...obj }
-    return new Promise((resolve, reject) => {
-        getH5Location(config).then(({ latitude, longitude }) => {
-            getAddress({ latitude, longitude }).then(res => {
-                resolve({ ...res, type: "h5" })
-            }).catch(err => {
-                reject(err)
-            })
-        }).catch(err => {
-            console.log(err);
-            getIpLocation(config).then(({ latitude, longitude }) => {
-                getAddress({ latitude, longitude }).then(res => {
-                    resolve({ ...res, type: "ip" })
-                }).catch(err => {
-                    reject(err)
-                })
-            }).catch(err => {
-                console.log(err);
-                reject(err)
-            })
-        })
-    })
-}
-
-/**
- * @description: 格式化searchList返回结果
- * @param {*}list/原列表
- * @return {*}
- */
-const formatSearchListResult = (list) => {
-    return list.map(item => {
-        return { code: item.id, name: item.name, pinyin: item.pinyin, location: item.location }
-    })
 }
 
 /**
  * @description: 省市区三级联动
- * @param {*}code/省、市、区县行政编码
- * @return {*}
+ * @param {*} code/地区编码
+ * @return {*}该地区下的子级地区列表
  */
 const searchList = async (code) => {
-    try {
-        // 省级
-        if (!code) {
-            const provinceArr = await importFile("province", 0)
-            return formatSearchListResult(provinceArr)
-        }
-        const id = code.toString()
-        // 市级
-        if (id.slice(2) === "0000") {
-            const cityArr = await importFile("city", code)
-            return formatSearchListResult(cityArr)
-        }
-        // 区、县
-        const districtArr = await importFile("district", code)
-        return formatSearchListResult(districtArr)
-    } catch (error) {
-        throw error
-    }
+    const list = await getList(code)
+    return list || []
 }
 
+/**
+ * @description: 解析字符串地址
+ * @param {*} str/地址字符串
+ * @param {*} detail/是否需要详细信息
+ * @return {*}
+ */
+const searchAddress = async (obj = {}) => {
+    const { address, detail } = { ...config.config, ...obj }
+    const code = await searchStrAddress(address)
+    if (!code) {
+        throw new Error("解析地址失败，请确认地址包含省级或市级名称")
+    }
+    const result = await searchCodeInfo({ code, detail })
+    return result
+}
 
+/**
+ * @description: 解析地区编码地址
+ * @param {*} address/地区编码
+ * @param {*} detail/是否需要详细信息
+ * @return {*}
+ */
+const searchCodeAddress = async (obj = {}) => {
+    const { code, detail } = { ...config.config, ...obj }
+    const result = await searchCodeInfo({ code, detail })
+    return result
+}
 
-module.exports = { getLocation, getH5Location, getIpLocation, getAddress, searchList, setConfig }
+module.exports = {
+    setConfig,
+    getLocation,
+    getH5Location: (obj) => timeoutFuc(getH5Location, obj),
+    getIpLocation: (obj) => timeoutFuc(getIpLocation, obj),
+    searchList,
+    searchCodeAddress: (obj) => timeoutFuc(searchCodeAddress, obj),
+    searchAddress: (obj) => timeoutFuc(searchAddress, obj),
+}

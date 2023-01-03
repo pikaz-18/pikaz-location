@@ -1,14 +1,12 @@
 /*
- * @Description: 这是获取ip地理地址页面（组件）
+ * @Description: 这是ip地理地址查询（组件）
  * @Date: 2022-12-21 11:21:38
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-12-28 18:06:34
+ * @LastEditTime: 2023-01-03 16:03:51
  */
 const { decompressFromEncodedURIComponent } = require("lz-string")
 const getFile = require("./getFile");
-const config = require("./config");
-const ipAddressArr = require("../store/ip/183.6.json");
 
 /**
  * @description: ip段加0
@@ -49,11 +47,13 @@ const getIp = () => {
     });
 };
 
-const getIpLocation = async (obj) => {
-    let { ip, timeout } = { ...config.config, ...obj }
-    // setTimeout(() => {
-    //     throw new Error("定位超时")
-    // }, timeout);
+/**
+ * @description: 获取ip地址行政编码
+ * @param {*} obj
+ * @return {*}
+ */
+const getIpCode = async (obj = {}) => {
+    let { ip } = { ...obj }
     if (!ip) {
         // ip缓存一天
         ip = await getFile.getVal({ key: "ip", gainVal: getIp, expiration: 1000 * 60 * 60 * 24 })
@@ -62,8 +62,7 @@ const getIpLocation = async (obj) => {
     if (ipArr.length !== 4) {
         throw new Error("ip格式错误，只支持ipv4")
     }
-    ip = "183.6.24.203"
-    // const ipAddressArr = await getFile.get({ dir: "ip", file: `${ipArr[0]}.${ipArr[1]}` })
+    const ipAddressArr = await getFile.get({ dir: "ip", file: `${ipArr[0]}.${ipArr[1]}` })
     const code = ipAddressArr.reduce((total, item) => {
         const { district, id } = item
         const ipNum = addZero(ip)
@@ -72,7 +71,7 @@ const getIpLocation = async (obj) => {
         }
         return total
     }, "")
-    return code
+    return { code, ip }
 }
 
-module.exports = { addZero, getIpLocation }
+module.exports = { addZero, getIpCode }
