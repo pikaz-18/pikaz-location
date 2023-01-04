@@ -13,6 +13,12 @@ ps：
 
 - 该插件的定位文件存放在第三方 cdn 中，若想存放至自己的 cdn 上，则可参考[setConfig](#setConfig)函数使用方法介绍
 
+更新日志：
+- [0.1.x文档请点击这里](https://github.com/pikaz-18/pikaz-location/blob/master/version/0.1.7.md)，1.x.x版本相比0.1.x版本有破坏性更新，如需升级注意重新对接文档。
+- 相比0.1.x版本新增了ip查询地址、地址文本解析、地区编码查询地址。
+- 重构了ip定位方法，使用ip文件处理ip定位，对第三方的ip定位无依赖，ip获取默认会缓存一天，也可自行结合自己服务获取用户ip进行ip定位。
+- 对定位文件进行优化，使每次定位所加载的文件更小，且对所有加载过的定位文件进行持久化缓存，第二次对于同市的定位速度在100ms以内。
+
 ## [demo 示例](https://pikaz-18.github.io/pikaz-location/example/index.html)
 
 ### [demo 代码](https://github.com/pikaz-18/pikaz-location/blob/master/example/index.html)
