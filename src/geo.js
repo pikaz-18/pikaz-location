@@ -3,7 +3,7 @@
  * @Date: 2022-12-28 17:57:55
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-03 11:42:09
+ * @LastEditTime: 2023-01-04 17:05:30
  */
 const getFile = require("./getFile");
 const pointInPolygon = require("point-in-polygon/flat")
@@ -28,22 +28,22 @@ const getGeo = (obj = {}) => {
                 navigator.geolocation.clearWatch(id);
                 switch (error.code) {
                     case error.PERMISSION_DENIED:
-                        reject("html5已拒绝定位")
+                        reject(new Error("html5已拒绝定位"))
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        reject("html5位置信息不可用")
+                        reject(new Error("html5位置信息不可用"))
                         break;
                     case error.TIMEOUT:
-                        reject("html5定位超时")
+                        reject(new Error("定位超时"))
                         break;
                     case error.UNKNOWN_ERROR:
-                        reject("html5定位未知错误")
+                        reject(new Error("html5定位未知错误"))
                         break;
                 }
             }, { enableHighAccuracy, timeout, maximumAge: 0 });
             return
         }
-        reject("浏览器不支持HTML5定位")
+        reject(new Error("浏览器不支持HTML5定位"))
     })
 }
 

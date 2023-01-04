@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-03 17:52:12
+ * @LastEditTime: 2023-01-04 17:02:50
  */
 const config = require("./config")
 const { getGeo, getGeoCode } = require("./geo")
@@ -21,7 +21,7 @@ const timeoutFuc = async (fuc, params = {}) => {
     const timeRace = () => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                reject("定位超时")
+                reject(new Error("定位超时"))
             }, timeout);
         })
     }

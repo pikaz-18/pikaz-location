@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 11:21:38
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-03 16:03:51
+ * @LastEditTime: 2023-01-04 17:06:37
  */
 const { decompressFromEncodedURIComponent } = require("lz-string")
 const getFile = require("./getFile");
@@ -39,7 +39,7 @@ const getIp = () => {
                 resolve(res.ip);
                 return;
             }
-            reject("ip定位失败");
+            reject(new Error("ip定位失败"))
         };
         const url = "BYFxAcGcC4HpYIbgJYDpkoGYE9UHsAnAc1gH5NCBbBEAXgCtI8A7cAMjYGMEAbHgIwScA1rSA"
         script.src = decompressFromEncodedURIComponent(url) + callbackName;

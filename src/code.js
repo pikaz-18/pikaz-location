@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 11:37:29
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-03 17:04:43
+ * @LastEditTime: 2023-01-04 19:09:42
  */
 const getFile = require("./getFile");
 
@@ -131,7 +131,8 @@ const searchStrAddress = async (str) => {
  * @return {*}
  */
 const searchCode = async (obj = {}) => {
-    const { code } = { ...obj }
+    let { code } = { ...obj }
+    code = typeof code === "string" ? code : code.toString()
     const result = {
         //省级单位名称
         province: "",

@@ -3,89 +3,128 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-01-11 01:05:35
+ * @LastEditTime: 2023-01-04 19:28:59
 -->
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>pikaz-location-demo</title>
     <!-- <script src="https://unpkg.com/@pikaz/location"></script> -->
     <script src="../lib/pikazLocation.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="app">运行结果:</div>
+    <div id="loading">加载中</div>
     <script>
-
-        const show = (name, content) => {
-            const p = document.createElement("p");
-            const app = document.getElementById("app");
-            app.appendChild(p);
-            p.innerHTML = name + ":" + JSON.stringify(content)
+      const show = (name, content) => {
+        const p = document.createElement("p");
+        const app = document.getElementById("app");
+        app.appendChild(p);
+        p.innerHTML = name + ":" + JSON.stringify(content);
+        const loading = document.getElementById("loading");
+        if (loading) {
+          loading.parentNode.removeChild(loading);
         }
+      };
 
-        const { getLocation, getH5Location, getIpLocation, getAddress, searchList } = window.pikazLocation
+      const {
+        setConfig,
+        getLocation,
+        getH5Location,
+        getIpLocation,
+        searchList,
+        searchCodeAddress,
+        searchAddress,
+      } = window.pikazLocation;
 
-        // getLocation示例
-        getLocation().then(res => {
-            console.log({ getLocation: res });
-        }).catch(err => {
-            console.log({ getLocation: err });
+      // 设置配置示例，不调用则采用默认配置
+      setConfig({
+        url: "https://unpkg.com/@pikaz/location/lib",
+        timeout: 100000,
+      });
+
+      // 默认定位
+      getLocation()
+        .then((res) => {
+          console.log({ getLocation: res });
         })
+        .catch((err) => {
+          console.log({ getLocation: err.message });
+        });
 
-        // getH5Location示例
-        getH5Location({ enableHighAccuracy: true }).then(res => {
-            console.log({ getH5Location: res });
-            // getAddress示例
-            const { latitude, longitude } = res
-            getAddress({ latitude, longitude }).then(res => {
-                show("h5定位", res)
-            }).catch(err => {
-                show("h5定位", err)
-            })
-        }).catch(err => {
-            show("h5定位", err)
-            console.log({ getH5Location: err });
+      // h5定位
+      getH5Location({ timeout: 5000 })
+        .then((res) => {
+          console.log({ getH5Location: res });
+          show("html5定位", res);
         })
+        .catch((err) => {
+          console.log({ getH5Location: err });
+          show("html5定位", err.message);
+        });
 
-        // getIpLocation示例
-        getIpLocation().then(res => {
-            console.log({ getIpLocation: res });
+      // 经纬度地址查询
+      getH5Location({
+        latitude: 22.547,
+        longitude: 114.085947,
+      }).then((res) => {
+        console.log({ getLatLocation: res });
+        show("查询经纬度（114.085947，22.547）", res);
+      });
 
-            // getAddress示例
-            const { latitude, longitude } = res
-            getAddress({ latitude, longitude }).then(res => {
-                show("ip定位(不精准)", res)
-                console.log({ getAddress: res });
-            }).catch(err => {
-                show("ip定位(不精准)", err)
-                console.log({ getAddress: err });
-            })
-        }).catch(err => {
-            show("ip定位(不精准)", err)
-            console.log({ getIpLocation: err });
+      // ip定位
+      getIpLocation()
+        .then((res) => {
+          console.log({ getIpLocation: res });
+          show("ip定位", res);
         })
+        .catch((err) => {
+          console.log({ getIpLocation: err });
+          show("ip定位", err.message);
+        });
 
-        // searchList示例
-        searchList().then(provinceList => {
-            // 省列表
-            console.log({ provinceList });
-            const { code: province } = provinceList[0]
-            searchList(province).then(cityList => {
-                // 市列表
-                console.log({ cityList });
-                const { code: city } = cityList[0]
-                searchList(city).then(districtList => {
-                    // 区县列表
-                    console.log({ districtList });
-                })
-            })
+      // ip查询
+      getIpLocation({ ip: "114.114.114.114" })
+        .then((res) => {
+          console.log({ getIpAddress: res });
+          show("查询ip（114.114.114.114）", res);
         })
+        .catch((err) => {
+          console.log({ getIpAddress: err });
+          show("查询ip（114.114.114.114）", err.message);
+        });
+
+      // 省市区三级联动
+      searchList().then((provinceList) => {
+        // 省列表
+        console.log({ provinceList });
+        const { code: province } = provinceList[0];
+        searchList(province).then((cityList) => {
+          // 市列表
+          console.log({ cityList });
+          const { code: city } = cityList[0];
+          searchList(city).then((districtList) => {
+            // 区县列表
+            console.log({ districtList });
+          });
+        });
+      });
+
+      //   地区编码查询
+      searchCodeAddress({ code: "440305" }).then((res) => {
+        console.log({ searchCodeAddress: res });
+        show("查询地区编码（440305）", res);
+      });
+
+      //   文本地址解析
+      searchAddress({ address: "深圳南山" }).then((res) => {
+        console.log({ searchAddress: res });
+        show("解析地址文本（深圳南山）", res);
+      });
     </script>
-</body>
-
+  </body>
 </html>

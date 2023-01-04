@@ -3,13 +3,13 @@
  * @Date: 2022-12-21 11:07:13
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-12-28 15:51:14
+ * @LastEditTime: 2023-01-04 19:17:57
  */
 const fs = require("fs");
 const path = require("path")
 const areaList = require("../store/areaList/index.json")
 const { addZero } = require("../src/ip")
-const { searchAddress } = require("../src/code")
+const { searchStrAddress } = require("../src/code")
 const { removeDir } = require("./common")
 
 const projectPath = process.cwd()
@@ -20,17 +20,12 @@ const projectPath = process.cwd()
  * @return {*}
  */
 const getIpCode = (code) => {
-    // 区县
-    if (code.district) {
-        return code.district
-    }
-    // 市级
-    if (code.city) {
-        return code.city
-    }
     // 没有市则取省会
-    const { children } = areaList.find(item => item.id === code.province)
-    return children[0].id
+    const item = areaList.find(item => item.id === code)
+    if (item) {
+        return item[0].id
+    }
+    return code
 }
 
 /**
@@ -116,12 +111,14 @@ const analysis = () => {
     } else {
         fs.mkdirSync(content)
     }
-    Object.keys(result).forEach(key => {
+    const keys = Object.keys(result)
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i]
         const info = result[key].map(item => {
-            return { district: item.district, start: item.start, end: item.end, id: getIpCode(searchAddress(item.address)) }
+            return { district: item.district, start: item.start, end: item.end, id: getIpCode(searchStrAddress(item.address)) }
         })
         fs.writeFileSync(path.join(projectPath, "store", "ip", `${key}.json`), JSON.stringify(info))
-    })
+    }
 }
 
 analysis()
