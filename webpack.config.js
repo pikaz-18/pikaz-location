@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-03 17:26:54
+ * @LastEditTime: 2023-01-05 20:30:28
  */
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -17,7 +17,8 @@ module.exports = {
         filename: 'pikazLocation.js',
         path: path.resolve(__dirname, 'lib'),
         libraryTarget: 'umd',
-        library: 'pikazLocation'
+        library: 'pikazLocation',
+        globalObject: 'this'
     },
     plugins: [
         new CleanWebpackPlugin(),
