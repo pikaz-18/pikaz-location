@@ -3,7 +3,7 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-05 16:45:10
+ * @LastEditTime: 2023-01-05 17:43:05
 -->
 <!DOCTYPE html>
 <html>
@@ -20,13 +20,13 @@
     <div id="app">运行结果:</div>
     <div id="loading">加载中</div>
     <script>
-      const show = (name, content) => {
+      const show = (name, content, close = true) => {
         const p = document.createElement("p");
         const app = document.getElementById("app");
         app.appendChild(p);
         p.innerHTML = name + ":" + JSON.stringify(content);
         const loading = document.getElementById("loading");
-        if (loading) {
+        if (loading && close) {
           loading.parentNode.removeChild(loading);
         }
       };
@@ -65,7 +65,7 @@
         })
         .catch((err) => {
           console.log({ getH5Location: err });
-          show("html5定位", err.message);
+          show("html5定位", err.message, false);
         });
 
       // 经纬度地址查询

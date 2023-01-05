@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-05 16:21:11
+ * @LastEditTime: 2023-01-05 17:42:02
  */
 const config = require("./config")
 const { getGeo, getGeoCode } = require("./geo")
@@ -96,7 +96,7 @@ const getLocation = async (obj = {}) => {
         const result = await getH5Location(obj)
         return { ...result, type: "h5" }
     } catch (error) {
-        const result = await getIpLocation(obj)
+        const result = await timeoutFuc(getIpLocation, obj)
         return { ...result, type: "ip" }
     }
 }
