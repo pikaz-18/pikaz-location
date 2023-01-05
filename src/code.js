@@ -3,9 +3,8 @@
  * @Date: 2022-12-21 11:37:29
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-05 16:27:56
+ * @LastEditTime: 2023-01-05 19:12:00
  */
-const { key } = require("localforage");
 const getFile = require("./getFile");
 
 /**
