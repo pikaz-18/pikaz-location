@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 11:21:38
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-04 17:06:37
+ * @LastEditTime: 2023-01-05 17:58:39
  */
 const { decompressFromEncodedURIComponent } = require("lz-string")
 const getFile = require("./getFile");
@@ -34,6 +34,9 @@ const getIp = () => {
     return new Promise((resolve, reject) => {
         const callbackName = "ipCallback" + new Date().getTime();
         const script = document.createElement("script");
+        script.onerror = () => {
+            reject(new Error("获取ip失败"))
+        }
         window[callbackName] = (res) => {
             if (res && res.ip) {
                 resolve(res.ip);
