@@ -3,41 +3,63 @@
  * @Date: 2022-12-21 11:07:13
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-04 19:17:57
+ * @LastEditTime: 2023-01-05 11:20:00
  */
 const fs = require("fs");
 const path = require("path")
-const areaList = require("../store/areaList/index.json")
+const originAreaList = require("../store/areaList/index.json")
 const { addZero } = require("../src/ip")
-const { searchStrAddress } = require("../src/code")
+const { analysisAddress } = require("../src/code")
 const { removeDir } = require("./common")
 
 const projectPath = process.cwd()
 
+const areaList = originAreaList.map(item => {
+    const { id, shortName, children } = item
+    return {
+        id, shortName, children: children.map(child => {
+            return { id: child.id }
+        })
+    }
+})
+
 /**
  * @description: 获取至少市级code
- * @param {*} code
+ * @param {*} codeObj
  * @return {*}
  */
-const getIpCode = (code) => {
-    // 没有市则取省会
-    const item = areaList.find(item => item.id === code)
-    if (item) {
-        return item[0].id
+const getIpCode = (codeObj) => {
+    const { province, city, district } = codeObj
+    if (district) {
+        return district
     }
-    return code
+    if (city) {
+        return city
+    }
+    // 没有市则取省会
+    const item = areaList.find(item => item.id === province)
+    if (item && item.children.length) {
+        return item.children[0].id
+    }
+    return null
 }
 
 /**
  * @description: 解析ip文件(ip.txt文件放至根目录处)
  * @return {*}
  */
-const analysis = () => {
+const analysis = async () => {
     const str = fs.readFileSync(path.join(projectPath, "ip.txt"), "utf8")
     if (!str) {
         console.log("ip文件不存在");
         return
     }
+    // 清空ip文件夹
+    const content = path.join(projectPath, "store", "ip")
+    if (fs.existsSync(content)) {
+        removeDir(content)
+    }
+    fs.mkdirSync(content)
     const ipArr = str.split("\r\n")
     const arr = []
     // 跨第一段ip，拆开
@@ -104,19 +126,18 @@ const analysis = () => {
             }
         }
     }
-    const content = path.join(projectPath, "store", "ip")
-    if (fs.existsSync(content)) {
-        removeDir(content)
-        fs.mkdirSync(content)
-    } else {
-        fs.mkdirSync(content)
-    }
     const keys = Object.keys(result)
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i]
-        const info = result[key].map(item => {
-            return { district: item.district, start: item.start, end: item.end, id: getIpCode(searchStrAddress(item.address)) }
-        })
+        const info = []
+        for (let j = 0; j < result[key].length; j++) {
+            const item = result[key][j]
+            const addressCode = await analysisAddress(item.address, originAreaList)
+            const id = getIpCode(addressCode)
+            if (id) {
+                info.push({ district: item.district, start: item.start, end: item.end, id })
+            }
+        }
         fs.writeFileSync(path.join(projectPath, "store", "ip", `${key}.json`), JSON.stringify(info))
     }
 }

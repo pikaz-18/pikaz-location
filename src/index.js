@@ -3,11 +3,11 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-04 17:02:50
+ * @LastEditTime: 2023-01-05 16:21:11
  */
 const config = require("./config")
 const { getGeo, getGeoCode } = require("./geo")
-const { getList, searchCodeInfo, searchStrAddress } = require("./code")
+const { getList, searchCodeInfo, searchStrAddress, searchCodeDetailInfo } = require("./code")
 const { getIpCode } = require("./ip")
 
 /**
@@ -56,12 +56,17 @@ const getH5Location = async (obj = {}) => {
         latitude = lat
         longitude = lon
     }
-    const code = await getGeoCode({ latitude, longitude })
-    if (!code) {
-        throw new Error("非中国境内")
-    }
-    const result = await searchCodeInfo({ code, detail })
-    return { ...result, latitude, longitude }
+    const result = await timeoutFuc(async () => {
+        const code = await getGeoCode({ latitude, longitude })
+        if (!code) {
+            throw new Error("非中国境内")
+        }
+        const info = await searchCodeInfo({ code, detail })
+        return { ...info, latitude, longitude }
+    }, {
+        timeout
+    })
+    return result
 }
 
 /**
@@ -88,10 +93,10 @@ const getIpLocation = async (obj = {}) => {
  */
 const getLocation = async (obj = {}) => {
     try {
-        const result = await timeoutFuc(getH5Location, obj)
+        const result = await getH5Location(obj)
         return { ...result, type: "h5" }
     } catch (error) {
-        const result = await timeoutFuc(getIpLocation, obj)
+        const result = await getIpLocation(obj)
         return { ...result, type: "ip" }
     }
 }
@@ -108,7 +113,7 @@ const searchList = async (code) => {
 
 /**
  * @description: 解析字符串地址
- * @param {*} str/地址字符串
+ * @param {*} address/地址字符串
  * @param {*} detail/是否需要详细信息
  * @return {*}
  */
@@ -124,7 +129,7 @@ const searchAddress = async (obj = {}) => {
 
 /**
  * @description: 解析地区编码地址
- * @param {*} address/地区编码
+ * @param {*} code/地区编码
  * @param {*} detail/是否需要详细信息
  * @return {*}
  */
@@ -137,9 +142,10 @@ const searchCodeAddress = async (obj = {}) => {
 module.exports = {
     setConfig,
     getLocation,
-    getH5Location: (obj) => timeoutFuc(getH5Location, obj),
+    getH5Location,
     getIpLocation: (obj) => timeoutFuc(getIpLocation, obj),
     searchList,
     searchCodeAddress: (obj) => timeoutFuc(searchCodeAddress, obj),
     searchAddress: (obj) => timeoutFuc(searchAddress, obj),
+    searchCodeDetail: (obj) => timeoutFuc(searchCodeDetailInfo, obj),
 }

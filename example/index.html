@@ -3,7 +3,7 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-04 19:28:59
+ * @LastEditTime: 2023-01-05 16:07:52
 -->
 <!DOCTYPE html>
 <html>
@@ -39,11 +39,12 @@
         searchList,
         searchCodeAddress,
         searchAddress,
+        searchCodeDetail,
       } = window.pikazLocation;
 
       // 设置配置示例，不调用则采用默认配置
       setConfig({
-        url: "https://unpkg.com/@pikaz/location/lib",
+        url: "https://common.dm-cube.com/common/h5/json/geotest",
         timeout: 100000,
       });
 
@@ -57,7 +58,7 @@
         });
 
       // h5定位
-      getH5Location({ timeout: 5000 })
+      getH5Location()
         .then((res) => {
           console.log({ getH5Location: res });
           show("html5定位", res);
@@ -124,6 +125,11 @@
       searchAddress({ address: "深圳南山" }).then((res) => {
         console.log({ searchAddress: res });
         show("解析地址文本（深圳南山）", res);
+      });
+
+      //   单个地区的详细信息
+      searchCodeDetail({ code: "440305" }).then((res) => {
+        console.log({ searchCodeDetail: res });
       });
     </script>
   </body>

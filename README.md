@@ -4,20 +4,20 @@
 
 特性：
 
-- 支持浏览器 h5 定位、ip 定位、经纬度查询地址、ip 查询、地区编码查询地址、地址文本解析、省市区三级联动列表搜索
-- 定位信息文件已做压缩处理，如果有启用 gzip 时部分定位大约只会花费几十 k
+* 支持浏览器 h5 定位、ip 定位、经纬度查询地址、ip 查询、地区编码查询地址、地址文本解析、省市区三级联动列表搜索
+* 定位信息文件已做压缩处理，如果有启用 gzip 时部分定位大约只会花费几十 k
 
 ps：
 
-- 由于浏览器限制，http 域名的网页使用 h5 定位可能会出现问题，如定位不准、禁止定位等，如果想要定位结果更加精准，最好使用 https 域名；
+* 由于浏览器限制，http 域名的网页使用 h5 定位可能会出现问题，如定位不准、禁止定位等，如果想要定位结果更加精准，最好使用 https 域名；
 
-- 该插件的定位文件存放在第三方 cdn 中，若想存放至自己的 cdn 上，则可参考[setConfig](#setConfig)函数使用方法介绍
+* 该插件的定位文件存放在第三方 cdn 中，若想存放至自己的 cdn 上，则可参考[setConfig](#setConfig)函数使用方法介绍
 
 更新日志：
-- [0.1.x文档请点击这里](https://github.com/pikaz-18/pikaz-location/blob/master/version/0.1.7.md)，1.x.x版本相比0.1.x版本有破坏性更新，如需升级注意重新对接文档。
-- 相比0.1.x版本新增了ip查询地址、地址文本解析、地区编码查询地址。
-- 重构了ip定位方法，使用ip文件处理ip定位，对第三方的ip定位无依赖，ip获取默认会缓存一天，也可自行结合自己服务获取用户ip进行ip定位。
-- 对定位文件进行优化，使每次定位所加载的文件更小，且对所有加载过的定位文件进行持久化缓存，第二次对于同市的定位速度在100ms以内。
+* [0.1.x文档请点击这里](https://github.com/pikaz-18/pikaz-location/blob/master/version/0.1.7.md)，1.x.x版本相比0.1.x版本有破坏性更新，如需升级注意重新对接文档。
+* 相比0.1.x版本新增了ip查询地址、地址文本解析、地区编码查询地址。
+* 重构了ip定位方法，使用ip文件处理ip定位，对第三方的ip定位无依赖，ip获取默认会缓存一天，也可自行结合自己服务获取用户ip进行ip定位。
+* 对定位文件进行优化，使每次定位所加载的文件更小，且对所有加载过的定位文件进行持久化缓存，第二次对于同市的定位速度在100ms以内。
 
 ## [demo 示例](https://pikaz-18.github.io/pikaz-location/example/index.html)
 
@@ -34,22 +34,23 @@ npm i -S @pikaz/location
 ```
 
 ```js
-import { getLocation } from "@pikaz/location";
+import {
+    getLocation
+} from "@pikaz/location";
 ```
 
 ### with cdn
 
 ```html
-<script
-  type="text/javascript"
-  src="https://cdn.jsdelivr.net/npm/@pikaz/location"
-></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@pikaz/location"></script>
 或者
 <script type="text/javascript" src="https://unpkg.com/@pikaz/location"></script>
 ```
 
 ```js
-const { getLocation } = window.pikazLocation;
+const {
+    getLocation
+} = window.pikazLocation;
 ```
 
 ### 方法函数
@@ -178,6 +179,18 @@ const { getLocation } = window.pikazLocation;
         <td>地区编码，若不传则获取所有省级地区列表</td>
         <td>-</td>
       </tr>
+      <tr>
+        <td rowspan="2">searchCodeDetail</td>
+        <td rowspan="2">获取单个地区编码的详细信息，等同于其他方法中的detail数据</td>
+        <td>timeout: Number/选填</td>
+        <td>超时时间</td>
+        <td>10000</td>
+      </tr>
+      <tr>
+        <td>code: String/必填</td>
+        <td>地区编码</td>
+        <td>-</td>
+      </tr>
     </table>
 
 注：[detail](#detail)开启则会在原本基础定位信息的基础上返回省市区的详细信息
@@ -191,12 +204,14 @@ const { getLocation } = window.pikazLocation;
 可把该项目的根目录下的 static 文件夹整个上传至您的 oss 上，将 static 文件夹的链接地址作为 url 传入，如 oss 上的 static 文件夹可通过https://xxx.com/file/static访问，则url可传入https://xxx.com/file，若不设置，则url默认使用https://unpkg.com/@pikaz/location/lib等公共cdn地址（第三方cdn可能不稳定，最好自行上传定位文件）
 
 ```js
-import { setConfig } from "@pikaz/location";
+import {
+    setConfig
+} from "@pikaz/location";
 setConfig({
-  // 超时时间
-  timeout: 10000,
-  // 您的oss地址
-  url: "https://unpkg.com/@pikaz/location/lib",
+    // 超时时间
+    timeout: 10000,
+    // 您的oss地址
+    url: "https://unpkg.com/@pikaz/location/lib",
 });
 ```
 
@@ -205,7 +220,9 @@ setConfig({
 说明：默认定位函数，优先使用html5定位，html5定位失败，则会自动切换为ip定位
 
 ```js
-import { getLocation } from "@pikaz/location";
+import {
+    getLocation
+} from "@pikaz/location";
 getLocation()
   .then((res) => {
     // 返回数据结构: {
@@ -223,25 +240,27 @@ getLocation()
 说明：html5 定位函数，html5 定位推荐使用 https 协议，若为 http，则 html5 定位可能出现定位不准确或无法定位（取决于浏览器策略），开启高精度定位会更加耗时；
 
 ```js
-import { getH5Location } from "@pikaz/location";
+import {
+    getH5Location
+} from "@pikaz/location";
 getH5Location({
-  // 开启gps高精度定位
-  enableHighAccuracy: true,
-})
-  .then((res) => {
-    // 返回数据结构:{
-    //     address: "广东省深圳市福田区"//完整地址
-    //     city: "深圳市"//市级名称
-    //     code: "440304"//地区编码
-    //     district: "福田区"//区县级名称
-    //     latitude: 22.547//区县级名称
-    //     longitude: 114.085947//区县级名称
-    //     province: "广东省"//省级名称
-    // }
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+        // 开启gps高精度定位
+        enableHighAccuracy: true,
+    })
+    .then((res) => {
+        // 返回数据结构:{
+        //     address: "广东省深圳市福田区"//完整地址
+        //     city: "深圳市"//市级名称
+        //     code: "440304"//地区编码
+        //     district: "福田区"//区县级名称
+        //     latitude: 22.547//区县级名称
+        //     longitude: 114.085947//区县级名称
+        //     province: "广东省"//省级名称
+        // }
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 ```
 
 <h2 id="getIpLocation">getIpLocation</h2>
@@ -249,21 +268,23 @@ getH5Location({
 说明：ip 定位函数，ip 定位相比 html5 定位精度更差且可能不准，但是若用户拒绝定位授权时，则可以使用 ip 定位作为兜底方案；
 
 ```js
-import { getIpLocation } from "@pikaz/location";
+import {
+    getIpLocation
+} from "@pikaz/location";
 getIpLocation()
-  .then((res) => {
-    // 返回数据结构:{
-    //     address: "江苏省南京市"//完整地址
-    //     city: "南京市"//市级名称
-    //     code: "320100"//地区编码
-    //     district: ""//区县级名称
-    //     province: "江苏省"//省级名称
-    //     ip: "114.114.114.114"//ip地址
-    // }
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+    .then((res) => {
+        // 返回数据结构:{
+        //     address: "江苏省南京市"//完整地址
+        //     city: "南京市"//市级名称
+        //     code: "320100"//地区编码
+        //     district: ""//区县级名称
+        //     province: "江苏省"//省级名称
+        //     ip: "114.114.114.114"//ip地址
+        // }
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 ```
 
 <h2 id="searchAddress">searchAddress</h2>
@@ -271,22 +292,24 @@ getIpLocation()
 说明：解析地址文本，必须带有省级或市级的全写或简写，不能只包含区县名称，如广东深圳/广东省深圳市/广东南山/深圳/深圳南山
 
 ```js
-import { searchAddress } from "@pikaz/location";
+import {
+    searchAddress
+} from "@pikaz/location";
 searchAddress({
-  address: "广东福田",
-})
-  .then((res) => {
-    // 返回数据结构:{
-    //     address: "广东省深圳市福田区"//完整地址
-    //     city: "深圳市"//市级名称
-    //     code: "440304"//地区编码
-    //     district: "福田区"//区县级名称
-    //     province: "广东省"//省级名称
-    // }
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+        address: "广东福田",
+    })
+    .then((res) => {
+        // 返回数据结构:{
+        //     address: "广东省深圳市福田区"//完整地址
+        //     city: "深圳市"//市级名称
+        //     code: "440304"//地区编码
+        //     district: "福田区"//区县级名称
+        //     province: "广东省"//省级名称
+        // }
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 ```
 
 <h2 id="searchCodeAddress">searchCodeAddress</h2>
@@ -294,22 +317,24 @@ searchAddress({
 说明：地区编码查询地址信息
 
 ```js
-import { searchCodeAddress } from "@pikaz/location";
+import {
+    searchCodeAddress
+} from "@pikaz/location";
 searchCodeAddress({
-  code: "440304",
-})
-  .then((res) => {
-    // 返回数据结构:{
-    //     address: "广东省深圳市福田区"//完整地址
-    //     city: "深圳市"//市级名称
-    //     code: "440304"//地区编码
-    //     district: "福田区"//区县级名称
-    //     province: "广东省"//省级名称
-    // }
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+        code: "440304",
+    })
+    .then((res) => {
+        // 返回数据结构:{
+        //     address: "广东省深圳市福田区"//完整地址
+        //     city: "深圳市"//市级名称
+        //     code: "440304"//地区编码
+        //     district: "福田区"//区县级名称
+        //     province: "广东省"//省级名称
+        // }
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 ```
 
 <h2 id="searchList">searchList</h2>
@@ -317,25 +342,54 @@ searchCodeAddress({
 说明：省市区三级联动，传入对应行政单位编码，获取下级行政单位列表；不传行政单位编码默认获取省级单位列表
 
 ```js
-import { searchList } from "@pikaz/location";
+import {
+    searchList
+} from "@pikaz/location";
 searchList({
-  code: "110000",
-})
-  .then((res) => {
-    // 返回数据结构: [
-    // {
-    //  "code":"110101",//该地区编码
-    //  "name":"东城区",//该地区名称
-    // },
-    // {
-    //  "code":"110102",//该地区编码
-    //  "name":"西城区",//该地区名称
-    // }
-    // ]
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+        code: "110000",
+    })
+    .then((res) => {
+        // 返回数据结构: [
+        // {
+        //  "code":"110101",//该地区编码
+        //  "name":"东城区",//该地区名称
+        // },
+        // {
+        //  "code":"110102",//该地区编码
+        //  "name":"西城区",//该地区名称
+        // }
+        // ]
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+```
+
+<h2 id="searchCodeDetail">searchCodeDetail</h2>
+
+说明：获取单个地区的详细信息：地区编码、经纬度、名称、名称拼音
+
+```js
+import {
+    searchCodeDetail
+} from "@pikaz/location";
+searchCodeDetail({
+        code: "440304",
+    })
+    .then((res) => {
+        // {
+        //     "code": "440304", //该地区编码
+        //     "location": { //该地区经纬度
+        //         "latitude": 22.521541,
+        //         "longitude": 114.05498
+        //     },
+        //     "name": "福田区", //该地区名称
+        //     "pinyin": "futianqu" //该地区拼音
+        // }
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 ```
 
 <h2 id="detail">detail</h2>
@@ -343,51 +397,53 @@ searchList({
 说明：若开启则会在原本的返回数据中额外返回详细的地址信息
 
 ```js
-import { getH5Location } from "@pikaz/location";
+import {
+    getH5Location
+} from "@pikaz/location";
 getH5Location({
-  // 获取详细地址信息
-  detail: true,
-})
-  .then((res) => {
-    // {
-    //     address: "广东省深圳市福田区" //完整地址
-    //     city: "深圳市" //市级名称
-    //     code: "440304" //地区编码
-    //     district: "福田区" //区县级名称
-    //     latitude: 22.547 //区县级名称
-    //     longitude: 114.085947 //区县级名称
-    //     province: "广东省" //省级名称
-    //     "detail": { //详细地址信息
-    //         "province": {
-    //             "code": "440000", //省级地区编码
-    //             "location": { //省级地区经纬度
-    //                 "latitude": 23.13171,
-    //                 "longitude": 113.26627
-    //             },
-    //             "name": "广东省", //省级名称
-    //             "pinyin": "guangdong" //省级名称拼音
-    //         },
-    //         "city": {
-    //             "code": "440300", //市级地区编码
-    //             "location": { //市级地区经纬度
-    //                 "latitude": 22.54286,
-    //                 "longitude": 114.05956
-    //             },
-    //             "name": "深圳市", //市级名称
-    //             "pinyin": "shenzhen" //市级名称拼音
-    //         },
-    //         "district": {
-    //             "code": "440304", //区县级地区编码
-    //             "location": { //区县级地区经纬度
-    //                 "latitude": 22.521541,
-    //                 "longitude": 114.05498
-    //             },
-    //             "name": "福田区", //区县级名称
-    //             "pinyin": "futianqu" //区县级名称拼音
-    //         }
-    //     }
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+        // 获取详细地址信息
+        detail: true,
+    })
+    .then((res) => {
+        // {
+        //     address: "广东省深圳市福田区" //完整地址
+        //     city: "深圳市" //市级名称
+        //     code: "440304" //地区编码
+        //     district: "福田区" //区县级名称
+        //     latitude: 22.547 //区县级名称
+        //     longitude: 114.085947 //区县级名称
+        //     province: "广东省" //省级名称
+        //     "detail": { //详细地址信息
+        //         "province": {
+        //             "code": "440000", //省级地区编码
+        //             "location": { //省级地区经纬度
+        //                 "latitude": 23.13171,
+        //                 "longitude": 113.26627
+        //             },
+        //             "name": "广东省", //省级名称
+        //             "pinyin": "guangdong" //省级名称拼音
+        //         },
+        //         "city": {
+        //             "code": "440300", //市级地区编码
+        //             "location": { //市级地区经纬度
+        //                 "latitude": 22.54286,
+        //                 "longitude": 114.05956
+        //             },
+        //             "name": "深圳市", //市级名称
+        //             "pinyin": "shenzhen" //市级名称拼音
+        //         },
+        //         "district": {
+        //             "code": "440304", //区县级地区编码
+        //             "location": { //区县级地区经纬度
+        //                 "latitude": 22.521541,
+        //                 "longitude": 114.05498
+        //             },
+        //             "name": "福田区", //区县级名称
+        //             "pinyin": "futianqu" //区县级名称拼音
+        //         }
+        //     }
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 ```

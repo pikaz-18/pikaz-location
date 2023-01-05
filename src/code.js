@@ -3,8 +3,9 @@
  * @Date: 2022-12-21 11:37:29
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-04 19:09:42
+ * @LastEditTime: 2023-01-05 16:27:56
  */
+const { key } = require("localforage");
 const getFile = require("./getFile");
 
 /**
@@ -43,14 +44,18 @@ const getAddressCode = ({ name, list }) => {
 
 /**
  * @description: 解析地址字符串（最低必须有省/市级）
- * @param {*} str
+ * @param {*} str/地区名称
+ * @param {*} list/地区列表(若不传则从远程获取)
  * @return {*}
  */
-const analysisAddress = async (str = "") => {
+const analysisAddress = async (str = "", list) => {
     let name = str
     const code = { province: "", city: "", district: "" }
+    let areaList = list
+    if (!list) {
+        areaList = await getAreaList()
+    }
     // 有省级
-    const areaList = await getAreaList()
     const province = getAddressCode({ name, list: areaList })
     if (province) {
         name = province.name
@@ -235,6 +240,21 @@ const searchCodeInfo = async ({ code, detail }) => {
     return result
 }
 
+const searchCodeDetailInfo = async ({ code }) => {
+    const { provinceCode, cityCode, districtCode } = await searchCode({ code })
+    // 获取单个地区编码详细信息
+    const info = await searchCodeDetail({ provinceCode, cityCode, districtCode })
+    if (Object.keys(info.district).length) {
+        return info.district
+    }
+    if (Object.keys(info.city).length) {
+        return info.city
+    }
+    if (Object.keys(info.province).length) {
+        return info.province
+    }
+}
+
 /**
  * @description: 获取某地区编码下的地区列表
  * @param {*} code/地区编码
@@ -267,4 +287,4 @@ const getList = async (code, areaList) => {
     }
 }
 
-module.exports = { getList, searchCodeInfo, searchStrAddress }
+module.exports = { getList, searchCodeInfo, searchStrAddress, analysisAddress, searchCodeDetailInfo }

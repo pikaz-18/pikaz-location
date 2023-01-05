@@ -3,7 +3,7 @@
  * @Date: 2022-12-28 15:49:21
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2022-12-28 16:08:45
+ * @LastEditTime: 2023-01-05 11:16:12
  */
 const fs = require("fs")
 
@@ -26,4 +26,7 @@ const removeDir = (dir) => {
     fs.rmdirSync(dir)
 }
 
-module.exports = { removeDir }
+// 直辖市
+const munCity = ["110000", "120000", "310000", "500000"]
+
+module.exports = { removeDir, munCity }
