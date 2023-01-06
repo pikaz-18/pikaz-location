@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 15:05:38
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-03 10:59:11
+ * @LastEditTime: 2023-01-07 00:06:19
  */
 const { decompressFromEncodedURIComponent } = require("lz-string")
 const localforage = require("localforage")
@@ -40,7 +40,7 @@ class GetFile {
         this.localConfig = {
             name: "pikazLocation",
             // 没有文件系统破坏性更新时则不更新大版本
-            storeName: "v" + version.split(".")[0]
+            storeName: "v" + version.split(".")[0] + "." + version.split(".")[1]
         };
     }
     /**

@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 11:37:29
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-05 19:12:00
+ * @LastEditTime: 2023-01-07 00:59:38
  */
 const getFile = require("./getFile");
 
@@ -205,8 +205,7 @@ const searchCode = async (obj = {}) => {
 const searchCodeDetail = async ({ provinceCode, cityCode, districtCode }) => {
     const result = { province: {}, city: {}, district: {} }
     if (provinceCode) {
-        const arr = await getFile.get({ dir: "province", file: "0" })
-        const item = arr.find(item => item.id === provinceCode)
+        const item = await getFile.get({ dir: "province", file: provinceCode })
         result.province = { code: item.id, location: item.location, name: item.name, pinyin: item.pinyin }
     }
     if (cityCode) {

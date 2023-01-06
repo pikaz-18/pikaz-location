@@ -3,7 +3,7 @@
  * @Date: 2022-12-28 17:57:55
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-04 17:05:30
+ * @LastEditTime: 2023-01-07 00:51:35
  */
 const getFile = require("./getFile");
 const pointInPolygon = require("point-in-polygon/flat")
@@ -75,8 +75,19 @@ const getGeoCode = async ({ latitude, longitude }) => {
     try {
         let code = ""
         // 省级
-        const provinceArr = await getFile.get({ dir: "province", file: "0" })
-        const province = searchAddressList({ latitude, longitude, address: provinceArr })
+        // 先从缩略经纬度找出符合的省级列表
+        const provinceShortArr = await getFile.get({ dir: "province", file: "short" })
+        const provinceArr = provinceShortArr.filter(item => searchAddressList({ latitude, longitude, address: [item] }))
+        // 再从详细经纬度找出省级
+        let province = ""
+        for (let i = 0; i < provinceArr.length; i++){
+            const { id } = provinceArr[i]
+            const provinceDetail = await getFile.get({ dir: "province", file: id })
+            const result = searchAddressList({ latitude, longitude, address: [provinceDetail] })
+            if (result) {
+                province=result
+            }
+        }
         if (province) {
             // 市级
             code = province.id
