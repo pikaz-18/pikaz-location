@@ -19,9 +19,9 @@ ps：
 * 重构了ip定位方法，使用ip文件处理ip定位，对第三方的ip定位无依赖，ip获取默认会缓存一天，也可自行结合自己服务获取用户ip进行ip定位。
 * 对定位文件进行优化，使每次定位所加载的文件更小，且对所有加载过的定位文件进行持久化缓存，第二次对于同市的定位速度在100ms以内。
 
-## [demo 示例](https://pikaz-18.github.io/pikaz-location/example/index.html)
+## [demo 示例点击这里一键体验](https://pikaz-18.github.io/pikaz-location/example/index.html)
 
-### [demo 代码](https://github.com/pikaz-18/pikaz-location/blob/master/example/index.html)
+## [demo 代码点击这里一键copy](https://github.com/pikaz-18/pikaz-location/blob/master/example/index.html)
 
 ## 安装
 

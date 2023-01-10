@@ -3,7 +3,7 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-05 18:00:00
+ * @LastEditTime: 2023-01-10 23:26:10
 -->
 <!DOCTYPE html>
 <html>
@@ -17,7 +17,7 @@
   </head>
 
   <body>
-    <div id="app">运行结果（因国内加载速度较慢，如果第一次超时，可刷新页面再查看结果）:</div>
+    <div id="app">运行结果（因国内加载速度较慢，如果第一次定位超时，可刷新页面再尝试）:</div>
     <div id="loading">加载中</div>
     <script>
       const show = (name, content, close = true) => {
@@ -65,7 +65,7 @@
         })
         .catch((err) => {
           console.log({ getH5Location: err });
-          show("html5定位", err.message, false);
+          show("html5定位(推荐使用手机打开该页面体验)", err.message, false);
         });
 
       // 经纬度地址查询
