@@ -3,7 +3,7 @@
  * @Date: 2022-01-03 20:41:58
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-02-17 11:47:08
+ * @LastEditTime: 2023-02-23 14:14:27
 -->
 <!DOCTYPE html>
 <html>
@@ -17,7 +17,9 @@
   </head>
 
   <body>
-    <div id="app">运行结果（因国内加载速度较慢，如果第一次定位超时，可刷新页面再尝试）:</div>
+    <div id="app">
+      运行结果（因国内加载速度较慢，如果第一次定位超时，可刷新页面再尝试）:
+    </div>
     <div id="loading">加载中</div>
     <script>
       const show = (name, content, close = true) => {
@@ -43,10 +45,10 @@
       } = window.pikazLocation;
 
       // 设置配置示例，不调用则采用默认配置
-      // setConfig({
-      //   url: "https://unpkg.com/@pikaz/location/lib",
-      //   timeout: 10000,
-      // });
+      setConfig({
+        url: "https://cdn.jsdelivr.net/npm/@pikaz/location/lib",
+        timeout: 10000,
+      });
 
       // 默认定位
       getLocation()
