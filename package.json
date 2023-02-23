@@ -1,63 +1,63 @@
 {
-    "name": "@pikaz/location",
-    "version": "1.0.6",
-    "description": "used to obtain location from the browser",
-    "private": false,
-    "main": "lib/pikazLocation.js",
-    "scripts": {
-        "compress": "node utils/compress.js",
-        "analysisip": "node utils/analysisIp.js",
-        "build": "webpack"
-    },
-    "keywords": [
-        "geolocation",
-        "location",
-        "longitude",
-        "latitude",
-        "province",
-        "city",
-        "district"
-    ],
-    "files": [
-        "lib"
-    ],
-    "publishConfig": {
-        "access": "public"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/pikaz-18/pikaz-location.git"
-    },
-    "author": "pikaz",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/pikaz-18/pikaz-location/issues"
-    },
-    "homepage": "https://github.com/pikaz-18/pikaz-location#readme",
-    "devDependencies": {
-        "clean-webpack-plugin": "^4.0.0",
-        "copy-webpack-plugin": "^10.2.0",
-        "object-hash": "^3.0.0",
-        "webpack": "^5.65.0",
-        "webpack-cli": "^4.9.1"
-    },
-    "dependencies": {
-        "localforage": "^1.10.0",
-        "lz-string": "^1.4.4",
-        "point-in-polygon": "^1.1.0"
-    },
-    "fileDate": {
-        "areaList": "202212301139",
-        "city": "202212301139",
-        "district": "202212301139",
-        "ip": "2023162329",
-        "province": "202317042"
-    },
-    "fileCode": {
-        "areaList": "64b5a33f94b14ae208fca152fdc89dca1048360a",
-        "city": "7827eb2bc906b83df109ab24242ce68f98f9558b",
-        "district": "14d77ce6236e2025a4b1e3900cc70d0c32a62d0b",
-        "ip": "0dc7c417520c4fea771e5e5cac6dd957858b893f",
-        "province": "629a3c20a32e0de95e0633e0385234e2b7886c2d"
-    }
+  "name": "@pikaz/location",
+  "version": "1.0.7",
+  "description": "used to obtain location from the browser",
+  "private": false,
+  "main": "lib/pikazLocation.js",
+  "scripts": {
+    "compress": "node utils/compress.js",
+    "analysisip": "node utils/analysisIp.js",
+    "build": "webpack"
+  },
+  "keywords": [
+    "geolocation",
+    "location",
+    "longitude",
+    "latitude",
+    "province",
+    "city",
+    "district"
+  ],
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pikaz-18/pikaz-location.git"
+  },
+  "author": "pikaz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pikaz-18/pikaz-location/issues"
+  },
+  "homepage": "https://github.com/pikaz-18/pikaz-location#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^10.2.0",
+    "object-hash": "^3.0.0",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  },
+  "dependencies": {
+    "localforage": "^1.10.0",
+    "lz-string": "^1.4.4",
+    "point-in-polygon": "^1.1.0"
+  },
+  "fileDate": {
+    "areaList": "202212301139",
+    "city": "202212301139",
+    "district": "202212301139",
+    "ip": "20232171120",
+    "province": "202317042"
+  },
+  "fileCode": {
+    "areaList": "64b5a33f94b14ae208fca152fdc89dca1048360a",
+    "city": "7827eb2bc906b83df109ab24242ce68f98f9558b",
+    "district": "14d77ce6236e2025a4b1e3900cc70d0c32a62d0b",
+    "ip": "7bd89190dd3ce49704dbee26d1abe730de44b992",
+    "province": "629a3c20a32e0de95e0633e0385234e2b7886c2d"
+  }
 }

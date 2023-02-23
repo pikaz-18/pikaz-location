@@ -74,7 +74,7 @@ const {
       <tr>
         <td>url: String/选填</td>
         <td>静态文件cdn地址</td>
-        <td>https://unpkg.com/@pikaz/location/lib</td>
+        <td>https://cdn.jsdelivr.net/npm/@pikaz/location/lib</td>
       </tr>
       <tr>
         <td>getLocation</td>
@@ -202,7 +202,7 @@ const {
 
 说明：设置全局配置（不调用则使用默认配置）
 
-可把该项目的根目录下的 static 文件夹整个上传至您的 oss 上，将 static 文件夹的链接地址作为 url 传入，如 oss 上的 static 文件夹可通过https://xxx.com/file/static访问，则url可传入https://xxx.com/file，若不设置，则url默认使用https://unpkg.com/@pikaz/location/lib等公共cdn地址（第三方cdn可能不稳定，最好自行上传定位文件）
+可把该项目的根目录下的 static 文件夹整个上传至您的 oss 上，将 static 文件夹的链接地址作为 url 传入，如 oss 上的 static 文件夹可通过https://xxx.com/file/static访问，则url可传入https://xxx.com/file，若不设置，则url默认使用https://cdn.jsdelivr.net/npm/@pikaz/location/lib等公共cdn地址（第三方cdn可能不稳定，最好自行上传定位文件）
 
 ```js
 import {
