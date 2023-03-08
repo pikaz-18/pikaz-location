@@ -1,6 +1,6 @@
 {
   "name": "@pikaz/location",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "used to obtain location from the browser",
   "private": false,
   "main": "lib/pikazLocation.js",

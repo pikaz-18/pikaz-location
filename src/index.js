@@ -3,7 +3,7 @@
  * @Date: 2021-12-26 22:58:52
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-05 17:42:02
+ * @LastEditTime: 2023-03-08 23:12:05
  */
 const config = require("./config")
 const { getGeo, getGeoCode } = require("./geo")
@@ -106,8 +106,9 @@ const getLocation = async (obj = {}) => {
  * @param {*} code/地区编码
  * @return {*}该地区下的子级地区列表
  */
-const searchList = async (code) => {
-    const list = await getList(code)
+const searchList = async (obj = {}) => {
+    const { code } = { ...obj }
+    const list = await getList(code || "")
     return list || []
 }
 
