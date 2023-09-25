@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 15:10:22
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-02-17 11:44:55
+ * @LastEditTime: 2023-09-25 17:05:00
  */
 class Config {
     constructor() {
@@ -18,6 +18,8 @@ class Config {
         }
         // cdn链接地址列表
         this.cdn = ["https://cdn.jsdelivr.net/npm/@pikaz/location/lib", "https://unpkg.com/@pikaz/location/lib"]
+        // 用户设置cdn地址
+        this.userCdn = ""
     }
     /**
      * @description: 修改配置
@@ -26,8 +28,8 @@ class Config {
      */
     set(obj) {
         this.config = { ...this.config, ...obj }
-        if (this.config.url && !this.cdn.includes(this.config.url)) {
-            this.cdn.unshift(this.config.url)
+        if (this.config.url) {
+            this.userCdn = this.config.url
         }
     }
 }

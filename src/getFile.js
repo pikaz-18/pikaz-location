@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 15:05:38
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-01-07 00:06:19
+ * @LastEditTime: 2023-09-25 17:37:48
  */
 const { decompressFromEncodedURIComponent } = require("lz-string")
 const localforage = require("localforage")
@@ -12,25 +12,40 @@ const { version, fileDate } = require("../package.json")
 
 /**
  * @description: 获取远程文件
- * @param {*} url/文件url
  * @param {*} file/文件地址
- * @param {*} list/地址链接列表
  * @return {*}
  */
-const fetchFile = async ({ url, file, list }) => {
-    let index = list.findIndex(item => item === url)
-    index = index === -1 ? 0 : index
-    try {
-        const fileJson = await fetch(`${list[index]}/static/${file}.json`).then(res => res.json())
+const fetchFile = async ({ file }) => {
+    const getFile = async (url, file) => {
+        const fileJson = await fetch(`${url}/static/${file}.json`).then(res => res.json())
         const jsonStr = decompressFromEncodedURIComponent(fileJson.s)
         const result = JSON.parse(jsonStr)
         return result
+    }
+    try {
+        // 优先使用用户设置的cdn地址获取文件
+        const userCdn = config.userCdn
+        if (userCdn) {
+            const result = await getFile(userCdn, file)
+            return result
+        }
+        throw new Error("未找到设置的url")
     } catch (error) {
-        // 最后一个路径失败则终止
-        if (index === list.length - 1) {
+        // 若没有或获取失败，则从公共cdn中获取
+        const cdnList = config.cdn
+        const promises = cdnList.map(item => {
+            return new Promise((resolve) => {
+                getFile(item, file).then(result => {
+                    resolve(result)
+                }).catch(() => { })
+            })
+        })
+        try {
+            const result = await Promise.race(promises)
+            return result
+        } catch (error) {
             throw new Error("定位失败")
         }
-        return fetchFile({ url: list[index + 1], file, list })
     }
 }
 
@@ -63,7 +78,7 @@ class GetFile {
         }
         // 没有则从远程获取
         try {
-            const result = await fetchFile({ file: `${dir}/${file}`, list: config.cdn })
+            const result = await fetchFile({ file: `${dir}/${file}` })
             // 异步写入
             this.local.setItem(name, result)
             return result
