@@ -5,7 +5,7 @@
  * @LastEditors: zouzheng
  * @LastEditTime: 2023-01-05 11:16:12
  */
-const fs = require("fs")
+const fs = require('fs')
 
 /**
  * @description: 删除文件夹
@@ -15,7 +15,7 @@ const fs = require("fs")
 const removeDir = (dir) => {
     const arr = fs.readdirSync(dir)
     for (let i = 0; i < arr.length; i++) {
-        const v = dir + "/" + arr[i]
+        const v = dir + '/' + arr[i]
         const info = fs.statSync(v)
         if (info.isFile()) {
             fs.unlinkSync(v)
@@ -27,6 +27,6 @@ const removeDir = (dir) => {
 }
 
 // 直辖市
-const munCity = ["110000", "120000", "310000", "500000"]
+const munCity = ['110000', '120000', '310000', '500000']
 
 module.exports = { removeDir, munCity }

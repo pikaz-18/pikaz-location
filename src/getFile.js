@@ -3,12 +3,13 @@
  * @Date: 2022-12-21 15:05:38
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-09-25 17:37:48
+ * @LastEditTime: 2023-12-01 02:38:37
  */
-const { decompressFromEncodedURIComponent } = require("lz-string")
-const localforage = require("localforage")
-const config = require("./config")
-const { version, fileDate } = require("../package.json")
+const axios = require('axios')
+const { decompressFromEncodedURIComponent } = require('lz-string')
+const localforage = require('localforage')
+const config = require('./config')
+const { version, fileDate } = require('../package.json')
 
 /**
  * @description: 获取远程文件
@@ -16,9 +17,23 @@ const { version, fileDate } = require("../package.json")
  * @return {*}
  */
 const fetchFile = async ({ file }) => {
+    const CancelToken = axios.CancelToken
+    let cancel
     const getFile = async (url, file) => {
-        const fileJson = await fetch(`${url}/static/${file}.json`).then(res => res.json())
-        const jsonStr = decompressFromEncodedURIComponent(fileJson.s)
+        const fileJson = await axios({
+            url: `${url}/static/${file}.json`,
+            method: 'get',
+            dataType: 'json',
+            cancelToken: new CancelToken(function executor(c) {
+                // executor 函数接收一个 cancel 函数作为参数
+                cancel = c
+            }),
+            timeout: config.timeout,
+        })
+        if (!(fileJson && fileJson.data && Object.prototype.toString.call(fileJson.data.s)=="[object String]")) {
+            throw new Error('未获取到文件')
+        }
+        const jsonStr = decompressFromEncodedURIComponent(fileJson.data.s)
         const result = JSON.parse(jsonStr)
         return result
     }
@@ -29,34 +44,40 @@ const fetchFile = async ({ file }) => {
             const result = await getFile(userCdn, file)
             return result
         }
-        throw new Error("未找到设置的url")
+        throw new Error('未找到设置的url')
     } catch (error) {
         // 若没有或获取失败，则从公共cdn中获取
         const cdnList = config.cdn
-        const promises = cdnList.map(item => {
+        const promises = cdnList.map((item) => {
             return new Promise((resolve) => {
-                getFile(item, file).then(result => {
-                    resolve(result)
-                }).catch(() => { })
+                getFile(item, file)
+                    .then((result) => {
+                        resolve(result)
+                    })
+                    .catch(() => {})
             })
         })
         try {
             const result = await Promise.race(promises)
             return result
         } catch (error) {
-            throw new Error("定位失败")
+            throw new Error('定位失败')
+        } finally {
+            // 取消所有请求
+            cancel()
         }
     }
 }
 
 class GetFile {
     constructor() {
-        this.local = null;
+        this.local = null
         this.localConfig = {
-            name: "pikazLocation",
+            name: 'pikazLocation',
             // 没有文件系统破坏性更新时则不更新大版本
-            storeName: "v" + version.split(".")[0] + "." + version.split(".")[1]
-        };
+            storeName:
+                'v' + version.split('.')[0] + '.' + version.split('.')[1],
+        }
     }
     /**
      * @description: 获取文件
@@ -66,7 +87,7 @@ class GetFile {
      */
     async get({ dir, file }) {
         if (!this.local) {
-            const local = localforage.createInstance(this.localConfig);
+            const local = localforage.createInstance(this.localConfig)
             await local.ready()
             this.local = local
         }
@@ -83,7 +104,7 @@ class GetFile {
             this.local.setItem(name, result)
             return result
         } catch (error) {
-            throw new Error("定位失败")
+            throw new Error('定位失败')
         }
     }
 
@@ -96,7 +117,7 @@ class GetFile {
      */
     async getVal({ key, gainVal, expiration }) {
         if (!this.local) {
-            const local = localforage.createInstance(this.localConfig);
+            const local = localforage.createInstance(this.localConfig)
             await local.ready()
             this.local = local
         }

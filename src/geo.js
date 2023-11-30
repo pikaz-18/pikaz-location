@@ -5,9 +5,9 @@
  * @LastEditors: zouzheng
  * @LastEditTime: 2023-01-07 00:51:35
  */
-const getFile = require("./getFile");
-const pointInPolygon = require("point-in-polygon/flat")
-const config = require("./config")
+const getFile = require('./getFile')
+const pointInPolygon = require('point-in-polygon/flat')
+const config = require('./config')
 
 /**
  * @description: 获取经纬度
@@ -19,31 +19,35 @@ const getGeo = (obj = {}) => {
     const { enableHighAccuracy, timeout } = { ...config.config, ...obj }
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
-            const id = navigator.geolocation.watchPosition((e) => {
-                // 纬度，经度
-                const { latitude, longitude } = e.coords;
-                navigator.geolocation.clearWatch(id);
-                resolve({ latitude, longitude })
-            }, (error) => {
-                navigator.geolocation.clearWatch(id);
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        reject(new Error("html5已拒绝定位"))
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        reject(new Error("html5位置信息不可用"))
-                        break;
-                    case error.TIMEOUT:
-                        reject(new Error("定位超时"))
-                        break;
-                    case error.UNKNOWN_ERROR:
-                        reject(new Error("html5定位未知错误"))
-                        break;
-                }
-            }, { enableHighAccuracy, timeout, maximumAge: 0 });
+            const id = navigator.geolocation.watchPosition(
+                (e) => {
+                    // 纬度，经度
+                    const { latitude, longitude } = e.coords
+                    navigator.geolocation.clearWatch(id)
+                    resolve({ latitude, longitude })
+                },
+                (error) => {
+                    navigator.geolocation.clearWatch(id)
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            reject(new Error('html5已拒绝定位'))
+                            break
+                        case error.POSITION_UNAVAILABLE:
+                            reject(new Error('html5位置信息不可用'))
+                            break
+                        case error.TIMEOUT:
+                            reject(new Error('定位超时'))
+                            break
+                        case error.UNKNOWN_ERROR:
+                            reject(new Error('html5定位未知错误'))
+                            break
+                    }
+                },
+                { enableHighAccuracy, timeout, maximumAge: 0 }
+            )
             return
         }
-        reject(new Error("浏览器不支持HTML5定位"))
+        reject(new Error('浏览器不支持HTML5定位'))
     })
 }
 
@@ -55,8 +59,8 @@ const getGeo = (obj = {}) => {
  * @return {*}
  */
 const searchAddressList = ({ latitude, longitude, address }) => {
-    return address.find(item => {
-        return item.polygon.find(poly => {
+    return address.find((item) => {
+        return item.polygon.find((poly) => {
             const check = pointInPolygon([longitude, latitude], poly)
             if (check) {
                 return poly
@@ -73,38 +77,64 @@ const searchAddressList = ({ latitude, longitude, address }) => {
  */
 const getGeoCode = async ({ latitude, longitude }) => {
     try {
-        let code = ""
+        let code = ''
         // 省级
         // 先从缩略经纬度找出符合的省级列表
-        const provinceShortArr = await getFile.get({ dir: "province", file: "short" })
-        const provinceArr = provinceShortArr.filter(item => searchAddressList({ latitude, longitude, address: [item] }))
+        const provinceShortArr = await getFile.get({
+            dir: 'province',
+            file: 'short',
+        })
+        const provinceArr = provinceShortArr.filter((item) =>
+            searchAddressList({ latitude, longitude, address: [item] })
+        )
         // 再从详细经纬度找出省级
-        let province = ""
-        for (let i = 0; i < provinceArr.length; i++){
+        let province = ''
+        for (let i = 0; i < provinceArr.length; i++) {
             const { id } = provinceArr[i]
-            const provinceDetail = await getFile.get({ dir: "province", file: id })
-            const result = searchAddressList({ latitude, longitude, address: [provinceDetail] })
+            const provinceDetail = await getFile.get({
+                dir: 'province',
+                file: id,
+            })
+            const result = searchAddressList({
+                latitude,
+                longitude,
+                address: [provinceDetail],
+            })
             if (result) {
-                province=result
+                province = result
             }
         }
         if (province) {
             // 市级
             code = province.id
-            const cityArr = await getFile.get({ dir: "city", file: province.id })
-            const city = searchAddressList({ latitude, longitude, address: cityArr })
+            const cityArr = await getFile.get({
+                dir: 'city',
+                file: province.id,
+            })
+            const city = searchAddressList({
+                latitude,
+                longitude,
+                address: cityArr,
+            })
             if (city) {
                 // 区县级
                 code = city.id
-                const districtArr = await getFile.get({ dir: "district", file: city.id })
-                const district = searchAddressList({ latitude, longitude, address: districtArr })
+                const districtArr = await getFile.get({
+                    dir: 'district',
+                    file: city.id,
+                })
+                const district = searchAddressList({
+                    latitude,
+                    longitude,
+                    address: districtArr,
+                })
                 if (district) {
                     code = district.id
                 }
             }
         }
         if (!code) {
-            throw new Error("非中国境内")
+            throw new Error('非中国境内')
         }
         return code
     } catch (error) {

@@ -5,11 +5,11 @@
  * @LastEditors: zouzheng
  * @LastEditTime: 2022-12-30 11:38:39
  */
-const fs = require("fs")
-const path = require("path")
-const { compressToEncodedURIComponent } = require("lz-string")
-const hash = require("object-hash")
-const { removeDir } = require("./common")
+const fs = require('fs')
+const path = require('path')
+const { compressToEncodedURIComponent } = require('lz-string')
+const hash = require('object-hash')
+const { removeDir } = require('./common')
 
 // 每个文件内容的hash值
 const code = {
@@ -33,7 +33,10 @@ const files = fs.readdirSync(path.join(__dirname, '../store'))
 for (let i = 0; i < files.length; i++) {
     const content = fs.readdirSync(path.join(__dirname, '../store', files[i]))
     for (let j = 0; j < content.length; j++) {
-        const data = fs.readFileSync(path.join(__dirname, '../store', files[i], content[j]), 'utf-8')
+        const data = fs.readFileSync(
+            path.join(__dirname, '../store', files[i], content[j]),
+            'utf-8'
+        )
         const str = compressToEncodedURIComponent(data)
         const jsonStr = { s: str }
         code[files[i]][content[j]] = hash(jsonStr)
@@ -41,7 +44,11 @@ for (let i = 0; i < files.length; i++) {
         if (!fs.existsSync(fileDir)) {
             fs.mkdirSync(fileDir)
         }
-        fs.writeFileSync(path.join(__dirname, '../static', files[i], content[j]), JSON.stringify(jsonStr), 'utf-8')
+        fs.writeFileSync(
+            path.join(__dirname, '../static', files[i], content[j]),
+            JSON.stringify(jsonStr),
+            'utf-8'
+        )
     }
 }
 
@@ -50,13 +57,21 @@ const keys = Object.keys(code)
 for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
     const hashStr = hash(code[key])
-    const package = fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
+    const package = fs.readFileSync(
+        path.join(__dirname, '../package.json'),
+        'utf-8'
+    )
     const packageJson = JSON.parse(package)
     if (packageJson.fileCode[key] !== hashStr) {
         const date = new Date()
         packageJson.fileCode[key] = hashStr
-        packageJson.fileDate[key] = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}${date.getHours()}${date.getMinutes()}`
-        fs.writeFileSync(path.join(__dirname, '../package.json'), JSON.stringify(packageJson), 'utf-8')
+        packageJson.fileDate[key] = `${date.getFullYear()}${
+            date.getMonth() + 1
+        }${date.getDate()}${date.getHours()}${date.getMinutes()}`
+        fs.writeFileSync(
+            path.join(__dirname, '../package.json'),
+            JSON.stringify(packageJson),
+            'utf-8'
+        )
     }
 }
-

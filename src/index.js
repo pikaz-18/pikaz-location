@@ -5,10 +5,15 @@
  * @LastEditors: zouzheng
  * @LastEditTime: 2023-03-08 23:12:05
  */
-const config = require("./config")
-const { getGeo, getGeoCode } = require("./geo")
-const { getList, searchCodeInfo, searchStrAddress, searchCodeDetailInfo } = require("./code")
-const { getIpCode } = require("./ip")
+const config = require('./config')
+const { getGeo, getGeoCode } = require('./geo')
+const {
+    getList,
+    searchCodeInfo,
+    searchStrAddress,
+    searchCodeDetailInfo,
+} = require('./code')
+const { getIpCode } = require('./ip')
 
 /**
  * @description: 超时处理
@@ -21,8 +26,8 @@ const timeoutFuc = async (fuc, params = {}) => {
     const timeRace = () => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                reject(new Error("定位超时"))
-            }, timeout);
+                reject(new Error('定位超时'))
+            }, timeout)
         })
     }
     const result = await Promise.race([fuc(params), timeRace()])
@@ -49,23 +54,32 @@ const setConfig = ({ timeout, url }) => {
  * @return {*}
  */
 const getH5Location = async (obj = {}) => {
-    let { timeout, enableHighAccuracy, detail, latitude, longitude } = { ...config.config, ...obj }
+    let { timeout, enableHighAccuracy, detail, latitude, longitude } = {
+        ...config.config,
+        ...obj,
+    }
     // 不传经纬度，则使用浏览器定位
     if (!(latitude && longitude)) {
-        const { latitude: lat, longitude: lon } = await getGeo({ timeout, enableHighAccuracy })
+        const { latitude: lat, longitude: lon } = await getGeo({
+            timeout,
+            enableHighAccuracy,
+        })
         latitude = lat
         longitude = lon
     }
-    const result = await timeoutFuc(async () => {
-        const code = await getGeoCode({ latitude, longitude })
-        if (!code) {
-            throw new Error("非中国境内")
+    const result = await timeoutFuc(
+        async () => {
+            const code = await getGeoCode({ latitude, longitude })
+            if (!code) {
+                throw new Error('非中国境内')
+            }
+            const info = await searchCodeInfo({ code, detail })
+            return { ...info, latitude, longitude }
+        },
+        {
+            timeout,
         }
-        const info = await searchCodeInfo({ code, detail })
-        return { ...info, latitude, longitude }
-    }, {
-        timeout
-    })
+    )
     return result
 }
 
@@ -94,10 +108,10 @@ const getIpLocation = async (obj = {}) => {
 const getLocation = async (obj = {}) => {
     try {
         const result = await getH5Location(obj)
-        return { ...result, type: "h5" }
+        return { ...result, type: 'h5' }
     } catch (error) {
         const result = await timeoutFuc(getIpLocation, obj)
-        return { ...result, type: "ip" }
+        return { ...result, type: 'ip' }
     }
 }
 
@@ -108,7 +122,7 @@ const getLocation = async (obj = {}) => {
  */
 const searchList = async (obj = {}) => {
     const { code } = { ...obj }
-    const list = await getList(code || "")
+    const list = await getList(code || '')
     return list || []
 }
 
@@ -122,7 +136,7 @@ const searchAddress = async (obj = {}) => {
     const { address, detail } = { ...config.config, ...obj }
     const code = await searchStrAddress(address)
     if (!code) {
-        throw new Error("解析地址失败，请确认地址包含省级或市级名称")
+        throw new Error('解析地址失败，请确认地址包含省级或市级名称')
     }
     const result = await searchCodeInfo({ code, detail })
     return result
