@@ -3,7 +3,7 @@
  * @Date: 2022-12-21 15:05:38
  * @Author: zouzheng
  * @LastEditors: zouzheng
- * @LastEditTime: 2023-12-01 02:38:37
+ * @LastEditTime: 2023-12-01 02:43:03
  */
 const axios = require('axios')
 const { decompressFromEncodedURIComponent } = require('lz-string')
@@ -30,7 +30,14 @@ const fetchFile = async ({ file }) => {
             }),
             timeout: config.timeout,
         })
-        if (!(fileJson && fileJson.data && Object.prototype.toString.call(fileJson.data.s)=="[object String]")) {
+        if (
+            !(
+                fileJson &&
+                fileJson.data &&
+                Object.prototype.toString.call(fileJson.data.s) ==
+                    '[object String]'
+            )
+        ) {
             throw new Error('未获取到文件')
         }
         const jsonStr = decompressFromEncodedURIComponent(fileJson.data.s)
