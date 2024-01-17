@@ -249,8 +249,8 @@ getH5Location({
         //     city: "深圳市"//市级名称
         //     code: "440304"//地区编码
         //     district: "福田区"//区县级名称
-        //     latitude: 22.547//区县级名称
-        //     longitude: 114.085947//区县级名称
+        //     latitude: 22.547//区县级纬度
+        //     longitude: 114.085947//区县级经度
         //     province: "广东省"//省级名称
         // }
     })
@@ -394,8 +394,8 @@ getH5Location({
         //     city: "深圳市" //市级名称
         //     code: "440304" //地区编码
         //     district: "福田区" //区县级名称
-        //     latitude: 22.547 //区县级名称
-        //     longitude: 114.085947 //区县级名称
+        //     latitude: 22.547 //区县级纬度
+        //     longitude: 114.085947 //区县级经度
         //     province: "广东省" //省级名称
         //     "detail": { //详细地址信息
         //         "province": {
